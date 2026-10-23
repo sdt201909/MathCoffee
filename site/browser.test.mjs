@@ -181,11 +181,16 @@ try {
         assert.equal(await page.locator('#theme-select').inputValue(), 'system');
         await page.emulateMedia({ colorScheme: 'light' });
         await expectTheme(page, 'light');
-        const light = await page.locator('body').evaluate((body) => getComputedStyle(body).backgroundColor);
+        const lightCSS = await page.locator('body').evaluate((body) => getComputedStyle(body).backgroundColor);
+        // Sample actual painted canvas pixels. CSSOM may report a transparent
+        // body when its background propagates to the document canvas.
+        const backgroundPixel = { clip: { x: 1, y: 150, width: 1, height: 1 }, animations: 'disabled' };
+        const light = await page.screenshot(backgroundPixel);
         await page.locator('#theme-select').selectOption('dark');
         await expectTheme(page, 'dark');
-        const dark = await page.locator('body').evaluate((body) => getComputedStyle(body).backgroundColor);
-        assert.notEqual(light, dark, 'Theme changes must change the rendered colors');
+        const darkCSS = await page.locator('body').evaluate((body) => getComputedStyle(body).backgroundColor);
+        const dark = await page.screenshot(backgroundPixel);
+        assert.notDeepEqual(light, dark, `Theme changes must change the painted background pixel (CSSOM light=${lightCSS}, dark=${darkCSS})`);
         await page.emulateMedia({ colorScheme: 'dark' });
         await page.emulateMedia({ colorScheme: 'light' });
         await expectTheme(page, 'dark');
