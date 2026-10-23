@@ -88,7 +88,7 @@ def write_wav(path: Path, audio: np.ndarray, sample_rate: int) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--catalog", type=Path, default=ROOT / "assets/audio/music_catalog.json")
+    parser.add_argument("--catalog", type=Path, default=ROOT / "src/mathcoffee/data/audio/music_catalog.json")
     parser.add_argument(
         "--output-dir", type=Path, default=ROOT / "media/audio/agent_upgrade_demo/music"
     )

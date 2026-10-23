@@ -1,0 +1,12 @@
+{
+  "name": "mathcoffee-development",
+  "interface": {"displayName": "MathCoffee local development"},
+  "plugins": [
+    {
+      "name": "mathcoffee",
+      "source": {"source": "local", "path": "./"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Productivity"
+    }
+  ]
+}

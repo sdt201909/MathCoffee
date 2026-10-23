@@ -94,7 +94,7 @@ def main():
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--expected-count", type=int)
     parser.add_argument("--revision", required=True)
-    parser.add_argument("--profiles", type=Path, default=ROOT / "assets/speech/voice_profiles.json")
+    parser.add_argument("--profiles", type=Path, default=ROOT / "src/mathcoffee/data/speech/voice_profiles.json")
     parser.add_argument("--profile", default="science_female")
     parser.add_argument("--review", type=Path)
     parser.add_argument("--seed", type=int, default=42)
@@ -107,7 +107,7 @@ def main():
         raise ValueError("seed outside uint32")
     authoring_path = args.authoring.resolve(strict=True)
     cut_path = args.cut.resolve(strict=True) if args.cut else None
-    lexicon = ROOT / "assets/speech/lexicon.json"
+    lexicon = ROOT / "src/mathcoffee/data/speech/lexicon.json"
     cli = ROOT / "scripts/synthesize_voice.py"
     model_path = ROOT / "media/models/Qwen3-TTS-12Hz-1.7B-CustomVoice"
     profiles = args.profiles.resolve(strict=True)

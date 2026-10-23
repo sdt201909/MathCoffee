@@ -18,7 +18,7 @@ help:
 	@echo "No installation, synthesis or rendering runs by default."
 
 setup:
-	$(UV) sync --locked
+	$(UV) sync --locked --no-editable --extra render
 
 doctor:
 	bash scripts/doctor.sh

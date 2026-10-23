@@ -63,7 +63,7 @@ class FigureLabelContractTests(unittest.TestCase):
         self.assertEqual(plan_for(text), make_plan({"id": "test", "text": text}, "qwen_mlx", EMPTY))
 
     def test_real_nonlabel_paragraph_and_plan_are_byte_equivalent(self):
-        lexicon = json.loads((ROOT / "assets/speech/lexicon.json").read_text())
+        lexicon = json.loads((ROOT / "src/mathcoffee/data/speech/lexicon.json").read_text())
         case = {
             "id": "unchanged",
             "text": "我们先看每一行，再把局部条件与整体结构联系起来。",

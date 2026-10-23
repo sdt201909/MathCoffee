@@ -1,0 +1,7 @@
+{
+  "name": "mathcoffee-development",
+  "owner": {"name": "MathCoffee"},
+  "plugins": [
+    {"name": "mathcoffee", "source": "./", "description": "Local MathCoffee development plugin"}
+  ]
+}

@@ -1,0 +1,28 @@
+#!/bin/sh
+# The installed plugin remains read-only. No implicit installs, downloads or PATH edits.
+set -eu
+
+if [ -n "${MATHCOFFEE_PYTHON:-}" ]; then
+  if [ ! -x "$MATHCOFFEE_PYTHON" ]; then
+    printf '%s\n' '{"status":"setup_required","reason":"MATHCOFFEE_PYTHON is not executable"}' >&2
+    exit 3
+  fi
+  export PYTHONDONTWRITEBYTECODE=1
+  exec "$MATHCOFFEE_PYTHON" -I -B -m mathcoffee "$@"
+fi
+
+runtime_base="${MATHCOFFEE_DATA_HOME:-${MATHCOFFEE_RUNTIME_DIR:-$HOME/Library/Application Support/MathCoffee}}"
+runtime_python="$runtime_base/core/bin/python"
+if [ -f "$runtime_base/runtime.json" ] && command -v python3 >/dev/null 2>&1; then
+  if ! runtime_python=$(python3 -I -c 'import json,sys; config=json.load(open(sys.argv[1], encoding="utf-8")); assert isinstance(config,dict); value=config.get("core_python",sys.argv[2]); assert isinstance(value,str) and value and "\n" not in value; print(value)' "$runtime_base/runtime.json" "$runtime_python" 2>/dev/null); then
+    printf '%s\n' '{"status":"setup_required","reason":"Invalid MathCoffee runtime.json core_python; select an external runtime with MATHCOFFEE_PYTHON."}' >&2
+    exit 3
+  fi
+fi
+if [ -x "$runtime_python" ]; then
+  export PYTHONDONTWRITEBYTECODE=1
+  exec "$runtime_python" -I -B -m mathcoffee "$@"
+fi
+
+printf '%s\n' '{"status":"setup_required","reason":"MathCoffee core runtime is not configured","next":"Use the setup skill to install the bundled wheel in an external Python 3.13 environment; set MATHCOFFEE_PYTHON to that environment executable."}' >&2
+exit 3

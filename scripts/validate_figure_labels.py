@@ -108,7 +108,7 @@ def main():
         "--registry", type=Path, help="Otherwise use authoring.figure_label_registry"
     )
     parser.add_argument("--world", "--model", type=Path, help="Frozen world JSON, never a video")
-    parser.add_argument("--lexicon", type=Path, default=ROOT / "assets/speech/lexicon.json")
+    parser.add_argument("--lexicon", type=Path, default=ROOT / "src/mathcoffee/data/speech/lexicon.json")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     report = {"scope": "Text/normalization contract only; no audio listening or model loading"}

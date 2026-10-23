@@ -18,7 +18,9 @@ from .planning import PronunciationError, patch_kokoro_phonemes
 KOKORO_REPO = "hexgrad/Kokoro-82M-v1.1-zh"
 KOKORO_REVISION = "01e7505bd6a7a2ac4975463114c3a7650a9f7218"
 MODEL_SUFFIXES = {".json", ".safetensors", ".txt", ".model", ".tiktoken", ".pt", ".pth"}
-QWEN_SOURCE_MANIFEST = Path(__file__).resolve().parents[3] / "toolchains/speech/model_files.json"
+from mathcoffee.resources import data_path
+
+QWEN_SOURCE_MANIFEST = data_path("speech/model_files.json")
 CAPABILITIES = {
     "kokoro": {
         "hard_phonemes": "v1.1-zh only, after strict character alignment",

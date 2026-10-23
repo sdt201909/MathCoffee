@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SPEC = json.loads(Path(__file__).with_name("model_files.json").read_text())
+SPEC = json.loads(ROOT / "src/mathcoffee/data/speech/model_files.json".read_text())
 DEST = ROOT / "media/models/Qwen3-TTS-12Hz-1.7B-CustomVoice"
 REPORT = ROOT / "media/reports/agent_upgrade/speech_runtime/model_manifest.json"
 

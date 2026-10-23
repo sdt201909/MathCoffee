@@ -24,7 +24,7 @@ from mathcoffee.music_library import (
 )
 from scripts import create_theme_music as cli
 
-CATALOG = Path(__file__).resolve().parents[1] / "assets/audio/music_catalog.json"
+CATALOG = Path(__file__).resolve().parents[1] / "src/mathcoffee/data/audio/music_catalog.json"
 
 
 class MusicLibraryTests(unittest.TestCase):

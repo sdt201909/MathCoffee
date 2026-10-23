@@ -17,8 +17,8 @@ from mathcoffee.speech.planning import (
 from mathcoffee.speech.providers import QwenMLXProvider, local_model_manifest, pinned_model_source
 
 ROOT = Path(__file__).resolve().parents[1]
-LEXICON = json.loads((ROOT / "assets/speech/lexicon.json").read_text())
-CASES = json.loads((ROOT / "assets/speech/smoke_cases.json").read_text())["cases"]
+LEXICON = json.loads((ROOT / "src/mathcoffee/data/speech/lexicon.json").read_text())
+CASES = json.loads((ROOT / "src/mathcoffee/data/speech/smoke_cases.json").read_text())["cases"]
 
 
 class SpeechPlanTests(unittest.TestCase):

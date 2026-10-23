@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "mathcoffee",
+  "version": "0.2.0-alpha.1",
+  "description": "Create and review mathematics videos with configurable MathCoffee visual, narrative and local audio workflows.",
+  "author": {"name": "MathCoffee"},
+  "repository": "https://github.com/sdt201909/MathCoffee",
+  "keywords": ["mathematics", "video", "manim", "remotion"],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "onboardingSkill": "./skills/setup/SKILL.md",
+      "interface": {
+        "displayName": "MathCoffee",
+        "shortDescription": "Configurable mathematics video production"
+      }
+    }
+  }
+}

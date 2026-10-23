@@ -880,11 +880,11 @@ wheels = [
 
 [[package]]
 name = "mathcoffee"
-version = "0.1.0"
+version = "0.2.0a1"
 source = { editable = "." }
-dependencies = [
-    { name = "manim", extra = ["jupyterlab"] },
-]
+[package.optional-dependencies]
+render = [{ name = "manim" }]
+notebook = [{ name = "manim", extra = ["jupyterlab"] }]
 
 [package.dev-dependencies]
 dev = [
@@ -893,7 +893,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "manim", extras = ["jupyterlab"], specifier = "==0.20.1" }]
+requires-dist = [
+    { name = "manim", marker = "extra == 'render'", specifier = "==0.20.1" },
+    { name = "manim", extras = ["jupyterlab"], marker = "extra == 'notebook'", specifier = "==0.20.1" },
+]
 
 [package.metadata.requires-dev]
 dev = [
