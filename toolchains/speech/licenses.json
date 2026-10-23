@@ -1,0 +1,7 @@
+{
+  "license": "Apache-2.0",
+  "source_url": "https://raw.githubusercontent.com/QwenLM/Qwen3-TTS/main/LICENSE",
+  "sha256": "a44a6081c73ad75f0255bb2bb5cab74ef1829565a895a24e53a4f11290ab7655",
+  "model_license_metadata": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/blob/0c0e3051f131929182e2c023b9537f8b1c68adfe/README.md",
+  "note": "License text copied from official Qwen3-TTS repository; model card at the pinned snapshot declares Apache-2.0. This is not an official Qwen Mac runtime; MLX-Audio is an independent MIT implementation."
+}

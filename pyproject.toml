@@ -1,0 +1,27 @@
+[project]
+name = "mathcoffee"
+version = "0.1.0"
+description = "Reproducible Manim environment for mathematics education animations."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "manim[jupyterlab]==0.20.1",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+    "ruff>=0.9",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.32,<0.12"]
+build-backend = "uv_build"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-exclude = ["media"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]

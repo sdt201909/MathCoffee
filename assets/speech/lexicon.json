@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "description": "Reviewed contextual readings for Kokoro v1.1-zh only. Qwen receives words, never these model-specific phonemes. No universal pronunciation guarantee.",
+  "pronunciations": [
+    {
+      "phrase": "每一行",
+      "kokoro_targets": [
+        {
+          "offset": 2,
+          "phoneme": "ㄏㄤ2",
+          "pinyin": "hang2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "可行",
+      "kokoro_targets": [
+        {
+          "offset": 1,
+          "phoneme": "ㄒ应2",
+          "pinyin": "xing2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "重根",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄔ中2",
+          "pinyin": "chong2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "重新",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄔ中2",
+          "pinyin": "chong2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "权重",
+      "kokoro_targets": [
+        {
+          "offset": 1,
+          "phoneme": "ㄓ中4",
+          "pinyin": "zhong4"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "单调",
+      "kokoro_targets": [
+        {
+          "offset": 1,
+          "phoneme": "ㄉ要4",
+          "pinyin": "diao4"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "调节",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄊ要2",
+          "pinyin": "tiao2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "奇数",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄐㄧ1",
+          "pinyin": "ji1"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "奇怪",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄑㄧ2",
+          "pinyin": "qi2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "模长",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄇㄛ2",
+          "pinyin": "mo2"
+        },
+        {
+          "offset": 1,
+          "phoneme": "ㄔㄤ2",
+          "pinyin": "chang2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "一卷",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄧ4",
+          "pinyin": "yi4"
+        },
+        {
+          "offset": 1,
+          "phoneme": "ㄐ元3",
+          "pinyin": "juan3"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "两只",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄌ阳3",
+          "pinyin": "liang3"
+        },
+        {
+          "offset": 1,
+          "phoneme": "ㄓ十1",
+          "pinyin": "zhi1"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "重贴",
+      "kokoro_targets": [
+        {
+          "offset": 0,
+          "phoneme": "ㄔ中2",
+          "pinyin": "chong2"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    },
+    {
+      "phrase": "偏好",
+      "kokoro_targets": [
+        {
+          "offset": 1,
+          "phoneme": "ㄏㄠ4",
+          "pinyin": "hao4"
+        }
+      ],
+      "scope": "Exact contextual phrase only; surrounding tone sandhi still requires review."
+    }
+  ],
+  "aliases": [
+    {
+      "source": "3.14",
+      "boundary": "number",
+      "spoken": "三点一四",
+      "kind": "spoken_form",
+      "providers": [
+        "kokoro",
+        "qwen_mlx"
+      ]
+    },
+    {
+      "source": "x²+1=0",
+      "boundary": "formula",
+      "spoken": "艾克斯的平方加一等于零",
+      "kind": "spoken_form",
+      "providers": [
+        "kokoro",
+        "qwen_mlx"
+      ]
+    },
+    {
+      "source": "AI",
+      "boundary": "identifier",
+      "spoken": "诶艾",
+      "kind": "spelling_alias",
+      "providers": [
+        "kokoro"
+      ]
+    },
+    {
+      "source": "AI",
+      "boundary": "identifier",
+      "spoken": "A I",
+      "kind": "spelling_alias",
+      "providers": [
+        "qwen_mlx"
+      ]
+    }
+  ]
+}

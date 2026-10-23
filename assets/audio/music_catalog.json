@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "catalog_id": "mathcoffee-original-starter-v1",
+  "description": "三个本地原创程序配乐配方；并非成熟多曲音乐库。实际 WAV 仅在生成清单校验成功后可用。",
+  "generator": "scripts/create_theme_music.py",
+  "license": {
+    "id": "LicenseRef-MathCoffee-Original-2026",
+    "source": "src/mathcoffee/music_library.py",
+    "provenance": "New procedural compositions authored for this project, using mathematical oscillators and seeded noise only. No external recordings, samples, or copied melodies.",
+    "project_usage": "MathCoffee may render, edit, synchronize, distribute and monetize these locally authored procedural tracks. This is a project provenance declaration, not a third-party license certification."
+  },
+  "tracks": [
+    {
+      "id": "warm_windows",
+      "title": "窗边慢光",
+      "asset_status": "generated_on_demand",
+      "recipe": "warm_pad_chimes_v1",
+      "themes": ["reflection", "family", "story", "回忆", "亲情", "故事"],
+      "moods": ["warm", "calm", "gentle", "温暖", "平静", "温柔"],
+      "sections": ["opening", "reflection", "ending", "片头", "反思", "结尾"],
+      "bpm": 60,
+      "rhythm": "slow four-bar major/add-nine pads; sparse upper chimes; no percussion",
+      "recommended_duration_seconds": [20, 120],
+      "target_rms_dbfs": -27,
+      "peak_ceiling_dbfs": -9,
+      "mix_gain_db": 0,
+      "duck_db": 12,
+      "seed": 173
+    },
+    {
+      "id": "small_steps",
+      "title": "一步一步",
+      "asset_status": "generated_on_demand",
+      "recipe": "exploration_arpeggio_v1",
+      "themes": ["mathematics", "discovery", "explanation", "数学", "探索", "讲解"],
+      "moods": ["curious", "moving", "light", "好奇", "推进", "轻快"],
+      "sections": ["development", "explanation", "transition", "展开", "讲解", "转场"],
+      "bpm": 96,
+      "rhythm": "alternating plucked eighth-note arpeggios; soft quarter-note wood pulse; changing bass",
+      "recommended_duration_seconds": [20, 120],
+      "target_rms_dbfs": -28,
+      "peak_ceiling_dbfs": -9,
+      "mix_gain_db": 0,
+      "duck_db": 14,
+      "seed": 281
+    },
+    {
+      "id": "unanswered_room",
+      "title": "未答之室",
+      "asset_status": "generated_on_demand",
+      "recipe": "suspense_pedal_v1",
+      "themes": ["mystery", "logic", "evidence", "悬疑", "逻辑", "证据"],
+      "moods": ["tense", "restrained", "uncertain", "悬念", "克制", "不确定"],
+      "sections": ["question", "reveal", "pause", "设问", "揭示", "停顿"],
+      "bpm": 48,
+      "rhythm": "low modal pedal; uneven isolated dissonant notes; filtered-air swells; no arpeggio",
+      "recommended_duration_seconds": [20, 120],
+      "target_rms_dbfs": -30,
+      "peak_ceiling_dbfs": -10,
+      "mix_gain_db": 0,
+      "duck_db": 12,
+      "seed": 419
+    }
+  ]
+}

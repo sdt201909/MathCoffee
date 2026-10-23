@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "acceptance": "Rules and signal checks are not listening approval. Every generated case starts pending_human_listening.",
+  "cases": [
+    {
+      "id": "polyphone_row",
+      "text": "先看矩阵的每一行，再判断这个方法是否可行。",
+      "expected_readings": [
+        "行(hang2): 每一行",
+        "行(xing2): 可行"
+      ]
+    },
+    {
+      "id": "polyphone_root",
+      "text": "这个方程有重根，我们重新检查权重。",
+      "expected_readings": [
+        "重(chong2): 重根",
+        "重(chong2): 重新",
+        "重(zhong4): 权重"
+      ]
+    },
+    {
+      "id": "polyphone_monotone",
+      "text": "这是单调递增函数，请调节语速。",
+      "expected_readings": [
+        "调(diao4): 单调",
+        "调(tiao2): 调节"
+      ]
+    },
+    {
+      "id": "polyphone_odd_norm",
+      "text": "奇数并不奇怪，先求向量的模长。",
+      "expected_readings": [
+        "奇(ji1): 奇数",
+        "奇(qi2): 奇怪",
+        "模长(mo2 chang2)"
+      ]
+    },
+    {
+      "id": "mixed_intro",
+      "text": "求导得到 derivative，再用 gradient descent 更新参数。",
+      "spans": [
+        {
+          "language": "zh",
+          "text": "求导得到 "
+        },
+        {
+          "language": "en",
+          "text": "derivative"
+        },
+        {
+          "language": "zh",
+          "text": "，再用 "
+        },
+        {
+          "language": "en",
+          "text": "gradient descent"
+        },
+        {
+          "language": "zh",
+          "text": " 更新参数。"
+        }
+      ],
+      "review_questions": [
+        "English words retained and intelligible?",
+        "Does timbre remain stable across switches?"
+      ]
+    },
+    {
+      "id": "mixed_eigen",
+      "text": "eigenvalue 是特征值；eigenvector 是特征向量。",
+      "spans": [
+        {
+          "language": "en",
+          "text": "eigenvalue"
+        },
+        {
+          "language": "zh",
+          "text": " 是特征值；"
+        },
+        {
+          "language": "en",
+          "text": "eigenvector"
+        },
+        {
+          "language": "zh",
+          "text": " 是特征向量。"
+        }
+      ],
+      "review_questions": [
+        "Both English terms intelligible and distinct?",
+        "One continuous female speaker?"
+      ]
+    },
+    {
+      "id": "emotion_sentence",
+      "text": "别着急，我们慢慢来。你刚才这一步已经很接近了。",
+      "review_questions": [
+        "Compare neutral_female and soft_female at equal seed.",
+        "Is softness audible beyond mere slower duration?",
+        "Any slurring, exaggerated breathiness or missing words?"
+      ]
+    },
+    {
+      "id": "formula_acronym",
+      "text": "取圆周率近似值 3.14，再看 x²+1=0，最后说到 AI。",
+      "expected_readings": [
+        "三点一四",
+        "艾克斯的平方加一等于零",
+        "AI: English letter names"
+      ]
+    },
+    {
+      "id": "measure_words",
+      "text": "将一卷纸放在两只托盘之间，再重贴标签。",
+      "expected_readings": [
+        "卷(juan3): 一卷",
+        "只(zhi1): 两只",
+        "重(chong2): 重贴"
+      ]
+    }
+  ]
+}

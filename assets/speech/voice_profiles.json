@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "description": "Default science narration uses Serena with rational, clear, moderately brisk delivery. Historical soft profiles remain reproducible. Style and consistency require listening; no voice cloning.",
+  "profiles": {
+    "soft_female": {
+      "description": "温柔、放松、略慵懒的成年女声；以清楚读音为前提。",
+      "qwen_mlx": {
+        "speaker": "Serena",
+        "language": "auto",
+        "temperature": 0.7,
+        "max_tokens": 1024,
+        "top_k": 50,
+        "top_p": 1,
+        "repetition_penalty": 1.05,
+        "stream": false,
+        "streaming_interval": 2,
+        "instruct": "请用温暖、温柔、放松的成年女性声音讲述，像在安静的咖啡厅里和朋友聊天。语气从容，有自然的轻重和停顿，略带慵懒但吐字清楚，不要耳语，不要夸张表演；中文与英文术语自然衔接。",
+        "text_conditioning": "full_text"
+      },
+      "kokoro": {
+        "voice_zh": "zf_001",
+        "voice_en": "zf_001",
+        "speed": 1,
+        "span_gap_seconds": 0.06,
+        "style_control": false,
+        "note": "Fixed existing female embedding; speed is duration control only, not an emotional/timbre upgrade."
+      }
+    },
+    "neutral_female": {
+      "description": "同一预置女声的中性对照。",
+      "qwen_mlx": {
+        "speaker": "Serena",
+        "language": "auto",
+        "temperature": 0.7,
+        "max_tokens": 1024,
+        "top_k": 50,
+        "top_p": 1,
+        "repetition_penalty": 1.05,
+        "stream": false,
+        "streaming_interval": 2,
+        "instruct": "请用自然、清楚、中性的语气朗读。",
+        "text_conditioning": "full_text"
+      },
+      "kokoro": {
+        "voice_zh": "zf_001",
+        "voice_en": "zf_001",
+        "speed": 1,
+        "span_gap_seconds": 0.06,
+        "style_control": false,
+        "note": "Identical fixed voice; this provider cannot distinguish style instructions."
+      }
+    },
+    "science_female": {
+      "description": "默认科普女声：清晰理性，适度有精神，语速略快而稳定；实际听感待审听。",
+      "qwen_mlx": {
+        "speaker": "Serena",
+        "language": "auto",
+        "temperature": 0.5,
+        "max_tokens": 1024,
+        "top_k": 50,
+        "top_p": 1,
+        "repetition_penalty": 1.05,
+        "stream": false,
+        "streaming_interval": 2,
+        "instruct": "请用清晰、理性、自然的科普讲述语气朗读，语速适中略快、均匀稳定，停顿简洁，句尾干净。",
+        "text_conditioning": "full_text"
+      },
+      "kokoro": {
+        "voice_zh": "zf_001",
+        "voice_en": "zf_001",
+        "speed": 1,
+        "span_gap_seconds": 0.06,
+        "style_control": false,
+        "note": "Compatibility voice only; Kokoro cannot honor science style instructions. Prefer qwen_mlx for the science profile."
+      }
+    }
+  },
+  "default_profile": "science_female"
+}

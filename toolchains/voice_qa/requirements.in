@@ -1,0 +1,6 @@
+# Local, CPU-only speaker consistency proxy. Independent from synthesis environments.
+onnxruntime==1.30.0
+kaldi-native-fbank==1.22.3
+numpy==2.5.3
+scipy==1.18.1
+soundfile==0.13.1

@@ -1,0 +1,4 @@
+# Minimal MLX runtime only. No cloud/server/STT/voice-cloning extras.
+mlx-audio==0.5.7
+# Provider writes PCM24 WAV and measures the decoded result with libsndfile.
+soundfile==0.13.1

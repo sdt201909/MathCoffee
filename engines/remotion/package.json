@@ -1,0 +1,27 @@
+{
+  "name": "mathcoffee-remotion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=24 <25"},
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "browser:ensure": "remotion browser ensure",
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.531",
+    "@remotion/cli": "4.0.531",
+    "@remotion/renderer": "4.0.531",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.531"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}
