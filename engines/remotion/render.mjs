@@ -7,7 +7,7 @@ import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {bundle} from '@remotion/bundler';
 import {ensureBrowser, openBrowser, selectComposition, renderMedia} from '@remotion/renderer';
-import {parseTimeline} from './src/schema.ts';
+import {parseTimeline, styleFontStack} from './src/schema.ts';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -62,6 +62,34 @@ export async function refuseExisting(file) {
   throw new Error(`Refusing to overwrite existing output: ${file}`);
 }
 
+function videoBitstreamHash(file) {
+  const command = ['-v', 'error', '-nostdin', '-i', file, '-map', '0:v:0', '-c:v', 'copy', '-f', 'hash', '-hash', 'sha256', 'pipe:1'];
+  const result = spawnSync('ffmpeg', command, {encoding: 'utf8'});
+  if (result.status !== 0 || !/^SHA256=[a-f0-9]{64}\s*$/u.test(result.stdout)) throw new Error(`Cannot fingerprint copied video packets: ${result.stderr}`);
+  return result.stdout.trim();
+}
+
+export async function muxExactPremix(picture, output, timeline, publicDir) {
+  const premix = await resolveAsset(publicDir, timeline.audio.file);
+  if (await sha256(premix) !== timeline.audio.sha256) throw new Error('Premix changed before final mux');
+  const pictureHash = await sha256(picture);
+  const bitstreamBefore = videoBitstreamHash(picture);
+  const command = ['ffmpeg', '-v', 'error', '-nostdin', '-n', '-i', picture, '-i', premix,
+    '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
+    '-ar', '48000', '-ac', '2', '-movflags', '+faststart', output];
+  const result = spawnSync(command[0], command.slice(1), {encoding: 'utf8'});
+  if (result.status !== 0) throw new Error(`Exact premix mux failed: ${result.stderr}`);
+  const bitstreamAfter = videoBitstreamHash(output);
+  if (bitstreamBefore !== bitstreamAfter) throw new Error('Final mux changed video packets');
+  if (pictureHash !== await sha256(picture) || timeline.audio.sha256 !== await sha256(premix)) throw new Error('Picture or premix changed during mux');
+  const version = spawnSync('ffmpeg', ['-version'], {encoding: 'utf8'});
+  if (version.status !== 0) throw new Error('Cannot identify native FFmpeg');
+  return {command, policy: 'one native AAC encode from exact original premix; picture stream copied without re-encoding or retiming',
+    ffmpeg_version: version.stdout.trim(), picture: {file: picture, sha256: pictureHash},
+    premix: {file: premix, sha256: timeline.audio.sha256, samples: timeline.audio.samples},
+    video_bitstream_sha256_before: bitstreamBefore, video_bitstream_sha256_after: bitstreamAfter};
+}
+
 export function argumentsFrom(argv) {
   const values = {};
   for (let i = 0; i < argv.length; i++) {
@@ -99,6 +127,8 @@ async function main() {
   const outputDir = path.dirname(args.output);
   await mkdir(outputDir, {recursive: true});
   const cacheDir = path.join(outputDir, '.remotion-cache', path.basename(args.output, '.mp4'));
+  const pictureOutput = timeline.audio ? path.join(cacheDir, 'picture.mp4') : args.output;
+  if (pictureOutput !== args.output) await refuseExisting(pictureOutput);
   const browserOptions = {logLevel: 'info', ...(args['browser-executable'] ? {browserExecutable: args['browser-executable']} : {})};
   const browserStatus = await ensureBrowser(browserOptions);
   if (!('path' in browserStatus)) throw new Error(`Browser unavailable: ${browserStatus.type}`);
@@ -111,11 +141,12 @@ async function main() {
   try {
     const composition = await selectComposition({serveUrl, id: 'MathCoffeeTimeline', inputProps: timeline, puppeteerInstance: browser, logLevel: 'warn'});
     let lastProgress = -1;
-    await renderMedia({composition, serveUrl, inputProps: timeline, outputLocation: args.output, codec: 'h264', pixelFormat: 'yuv420p', audioCodec: 'aac', audioBitrate: '192k', sampleRate: 48000, crf: 18, x264Preset: 'medium', concurrency: 2, offthreadVideoCacheSizeInBytes: 256 * 1024 * 1024, puppeteerInstance: browser, overwrite: false, logLevel: 'warn', onProgress: ({progress}) => {
+    await renderMedia({composition, serveUrl, inputProps: timeline, outputLocation: pictureOutput, muted: true, codec: 'h264', pixelFormat: 'yuv420p', crf: 18, x264Preset: 'medium', concurrency: 2, offthreadVideoCacheSizeInBytes: 256 * 1024 * 1024, puppeteerInstance: browser, overwrite: false, logLevel: 'warn', onProgress: ({progress}) => {
       const mark = Math.floor(progress * 10);
       if (mark !== lastProgress) {lastProgress = mark; console.log(`Rendering ${mark * 10}%`);}
     }});
   } finally { await browser.close({silent: true}); }
+  const audioMux = timeline.audio ? await muxExactPremix(pictureOutput, args.output, timeline, args['public-dir']) : null;
   if (propsSha256 !== await sha256(args.props)) throw new Error('Props changed during render');
   if (JSON.stringify(sourceHashes) !== JSON.stringify(await fingerprintSources())) throw new Error('Renderer sources changed during render');
   await verifyAssets(timeline, args['public-dir']);
@@ -131,6 +162,10 @@ async function main() {
     throw new Error('Rendered video metadata does not match the timeline');
   }
   if (timeline.audio ? audios.length !== 1 || Number(a?.sample_rate) !== 48000 || a?.channels !== 2 : audios.length !== 0) throw new Error('Missing or unexpected output audio track');
+  if (timeline.audio) {
+    const [num, den] = a.time_base.split('/').map(Number);
+    if (a.codec_name !== 'aac' || Number(a.start_pts) !== 0 || Number(a.duration_ts) * num * 48000 !== timeline.audio.samples * den) throw new Error('Final native AAC container clock differs from exact original premix');
+  }
   const receipt = {
     schema_version: 1, success: true, composition: 'MathCoffeeTimeline', started_at: startedAt.toISOString(), finished_at: new Date().toISOString(),
     elapsed_seconds: (Date.now() - startedAt.getTime()) / 1000,
@@ -139,8 +174,8 @@ async function main() {
     remotion_version: require('remotion/package.json').version,
     node_version: process.version, platform: process.platform, arch: process.arch,
     browser_version: browserVersion, browser_executable: browserStatus.path, browser_sha256: await sha256(browserStatus.path), browser_executable_override: args['browser-executable'] ?? null,
-    font_stack: 'PingFang SC, Hiragino Sans GB, sans-serif',
-    props: {file: args.props, sha256: propsSha256}, renderer_sources: sourceHashes, assets,
+    font_stack: timeline.style ? styleFontStack(timeline.style) : 'PingFang SC, Hiragino Sans GB, sans-serif',
+    props: {file: args.props, sha256: propsSha256}, renderer_sources: sourceHashes, assets, audio_mux: audioMux,
     parameters: {concurrency: 2, offthread_video_cache_bytes: 268435456, codec: 'h264', pixel_format: 'yuv420p', crf: 18, preset: 'medium', audio_codec: 'aac', sample_rate: 48000, license_key_set: false},
     expected: {width: timeline.width, height: timeline.height, fps: timeline.fps, frames: timeline.duration_frames, duration_seconds: timeline.duration_frames / timeline.fps, has_audio: Boolean(timeline.audio)},
     qa_anchor_roi_at_1920x1080: {x: 1840, y: 80, width: 32, height: 32, duration_frames: 2},

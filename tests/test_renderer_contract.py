@@ -54,6 +54,17 @@ class RendererContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exactly"):
             self.check()
 
+    def test_silent_contract_requires_explicit_opt_in_and_keeps_anchor_validation(self):
+        plan = copy.deepcopy(self.plan)
+        plan["audio"] = None
+        with self.assertRaisesRegex(ValueError, "mixed audio"):
+            self.check(plan)
+        result = validate_timeline(plan, self.root, inspect_media=False, allow_no_audio=True)
+        self.assertEqual(result["audio_samples"], 0)
+        plan["qa"]["anchor_frames"] = [119]
+        with self.assertRaisesRegex(ValueError, "extends"):
+            validate_timeline(plan, self.root, inspect_media=False, allow_no_audio=True)
+
     def test_noninteger_and_boolean_frame_clocks_are_rejected(self):
         for value in (60.0, True, 0, -1):
             with self.subTest(value=value), self.assertRaises(ValueError):

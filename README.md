@@ -1,76 +1,91 @@
 # MathCoffee · 知数咖啡厅
 
-面向 Agent 的数学科普视频制作工具集：用一份创作数据连接数学状态、画面、旁白、
-字幕和验收，让新作品延续清晰推理、严谨几何与简洁叙事的风格。
+本地运行、面向 Agent 的数学视频制作框架。默认预设延续 MathCoffee 的问题驱动讲述、
+深色数学画面、语义配色与科普声音；使用者可以替换品牌，并通过配置调整风格。
 
-当前是 **Plugin 开发前的框架基础版本**，尚不能通过插件安装后直接完成一键制作。
-仓库只保存通用工具、配置、依赖锁和工作约定；频道单期代码、正文、素材、声音、
-成片与本机制作记录留在独立的本地制作工程中。
+当前版本为 **0.2.0a1 开发候选版**：已实现独立 CLI、创作数据编译、通用 Manim 组件、
+Remotion 编排与 Codex／Claude Code 插件包。它需要本地制作依赖；安装插件不会自动
+安装 TeX、下载声音模型或替你确认数学、听感和风格。首批校准预设仍待作者确认，
+尚未公开发布或选择项目开源许可证。
 
-## 已有能力
+## 安装与首次使用
 
-- Manim 数学动画环境和 Remotion 横屏／竖屏编排；共享帧时间轴、素材哈希和媒体预检。
-- 本地配音 provider、版本化发音词典、图形标签身份校验与逐句声音记录。
-- 原创程序配乐、实际句窗驱动的避让、编码音轨与音频缓存验证。
-- 受众文字检查、数学／论述／画面／试听分开记录的制作约定。
-- 显式提交文件白名单与历史检查，防止把本地制作内容带入仓库。
+首版支持 Apple Silicon Mac。使用生成的宿主 ZIP，解压到新目录；包中包含对应
+marketplace、skills、启动器、框架 wheel、引擎与锁文件。源码仓库中的 marketplace
+用于开发，发行与试用应使用含 wheel 的完整包。
+
+按宿主的 marketplace 安装流程加载插件，再调用 MathCoffee 的 setup 工作流。
+[Codex 插件规范](https://developers.openai.com/plugins/build/plugins) 与
+[Claude Code 插件规范](https://code.claude.com/docs/en/plugins/create) 说明宿主安装方式。
+
+也可以先把发行包中的 wheel 安装到独立 Python 3.13 环境，直接使用 CLI：
+
+```sh
+uv venv --python /absolute/path/to/python3.13 /absolute/path/to/mathcoffee-core
+uv pip install --python /absolute/path/to/mathcoffee-core/bin/python /absolute/path/to/mathcoffee.whl
+/absolute/path/to/mathcoffee-core/bin/mathcoffee init \
+  --workspace '/absolute/path/to/my video' --brand '自己的频道' --title '观众问题'
+/absolute/path/to/mathcoffee-core/bin/mathcoffee plan --workspace '/absolute/path/to/my video'
+```
+
+新工程是空白创作模板，`plan` 会返回 `incomplete`，直到填写正文、场景和数学状态。
+没有模型或渲染依赖也能完成规划。配置字段见 [创作与配置接口](docs/project_interface.md)。
+
+```sh
+mathcoffee doctor --workspace '/absolute/path/to/my video'
+mathcoffee setup --component render       # 仅显示准备步骤
+mathcoffee setup --component speech       # 独立 Python 3.12 配音环境
+mathcoffee setup --component model        # 固定公开权重、来源与大小
+# 已授权执行准备时，给相应命令加 --execute。
+# render 可加 --wheel 指定同一发行版的本地 wheel。
+
+mathcoffee voice --workspace '/absolute/path/to/my video'              # 只准备请求
+mathcoffee voice --workspace '/absolute/path/to/my video' --generate   # 本地离线合成
+mathcoffee preview --workspace '/absolute/path/to/my video'
+mathcoffee verify --workspace '/absolute/path/to/my video' --quality draft
+mathcoffee status --workspace '/absolute/path/to/my video'
+mathcoffee resume --workspace '/absolute/path/to/my video' --quality draft
+```
+
+低清全片技术检查通过后，完成真实画面审查并填写对应哈希绑定的 `reviews.json`，
+才可运行 `mathcoffee render --workspace ... --quality final`。数学、叙事、听审、风格和
+观众理解状态分别记录；自动 PASS 不代替这些判断。输出保存到用户工程，失败产物保留。
+
+## 默认风格与配置
+
+- `mathcoffee-shorts@1`：9:16、1080×1920/60，深色底、蓝／青对象、金色结果；
+  默认有配音、无烧录旁白字幕，保留数学标签、公式和标题。
+- `mathcoffee-longform@1`：16:9、1920×1080/60，独立横屏配色、标题／主图／公式区域；
+  字幕策略独立配置，不将竖屏偏好强加横屏。
+- 默认 Serena／science_female／全文本条件。可使用其他预置声音、本地 provider，
+  或导入逐句 PCM；更换声音必须重新试听。不克隆真人、不调用收费合成 API。
+- 两引擎共用解析后的颜色、字体、布局、字号和时窗。配置变更记录差异与身份；
+  没有全局三分钟上限，不靠变速或裁尾挤入预算。
+
+预设约定与校准边界见 [风格基线](docs/style_baseline.md)。自定义数学画面可在用户
+工程提供 SceneBase 子类；框架不执行数学表达式字符串，也不会自动证明任意新主题。
+
+## 开发与验证
 
 先读 [Agent 约定](AGENTS.md)、[文档入口](docs/README.md) 和
-[制作流程](docs/production_workflow.md)。插件化后续工作见 [路线图](docs/plugin_roadmap.md)。
-
-## 环境与安装
-
-当前运行基线为 macOS Apple Silicon、Python 3.13、Manim 0.20.1；JavaScript 引擎
-使用 Node 24、Remotion 4.0.531。配音使用独立 Python 3.12 环境，不能混装到 Manim。
-完整 TeX Live／MacTeX、中文字体，以及音视频预检所需的 FFmpeg／FFprobe 需另行准备。
+[制作流程](docs/production_workflow.md)。裸 `make` 只显示帮助。
 
 ```sh
-# 已具备 Homebrew、uv、Cairo、pkgconf 时，同步锁定 Python 环境。
-uv sync --locked
-make help
-make doctor
+uv sync --locked --no-editable --extra render
 make test-core
-
-# 可选：Remotion 依赖安装；浏览器下载是单独的显式操作。
-make remotion-setup
+make test-speech                 # 使用独立 .venv-speech
+make test-voice-qa               # 使用独立 .venv-voice-qa
 make remotion-check
-make remotion-browser
+uv build --wheel                 # 后端在临时 staging 汇集白名单资源
+mathcoffee bundle --host codex --wheel /absolute/path/to/wheel.whl --output /absolute/path/new-codex.zip
+mathcoffee bundle --host claude --wheel /absolute/path/to/wheel.whl --output /absolute/path/new-claude.zip
 ```
 
-`make` 只显示帮助，不安装、不渲染。`make doctor` 运行本机 TeX 烟测。
-配音环境、权重下载与声音测试见 [配音管线](docs/voice_pipeline.md)。
-本仓库不包含模型权重，不使用收费合成 API，不自动上传正文或音频。
+自定义构建后端不提供 editable 安装；使用 wheel 或 `--no-editable`。
+原有渲染及声音依赖版本保持锁定；准备系统 Cairo、TeX／中文字体、FFmpeg／FFprobe 后
+再执行渲染安装。锁文件与源代码不等于新机器已经验收，实际状态见
+[实施与验收状态](docs/implementation_status.md)、[后续路线图](docs/plugin_roadmap.md)。
 
-## 使用边界
-
-新一期的 authoring、场景、实验、素材和输出存入本地制作工程；本仓库不携带历史作品。
-当前尚未完成可安装的软件包／插件入口分离，现有 CLI 依赖仓库布局；制作时需使用
-独立本地 checkout，或在本地工作区放入被忽略的 `scenes/`、`assets/` 与 `media/` 内容。
-通用的场景调用始终显式指定项目配置：
-
-```sh
-uv run --locked manim --config_file manim.cfg -ql scenes/your_scene.py YourScene
-```
-
-运行命令前按 `--help` 核对输入；渲染使用新输出路径，先低清审查，再做高清交付。
-本次框架验证覆盖自动测试与静态检查，没有合成新声音或渲染新影片。
-
-## 仓库结构
-
-| 路径 | 内容 |
-|---|---|
-| `src/mathcoffee/` | 时间轴、音频、配乐、配音与标签契约 |
-| `scripts/` | 通用制作 CLI、环境诊断与仓库边界检查 |
-| `engines/remotion/` | 通用合成器、类型与媒体预检 |
-| `assets/speech/`、`assets/audio/` | 通用词典、声音配置与程序配乐配方，无媒体素材 |
-| `toolchains/` | 独立可选运行时、锁文件和第三方许可证 |
-| `tests/` | 不依赖单集文件的通用回归测试 |
-| `docs/` | 制作约定、能力边界与插件化路线 |
-| `repository-files.txt` | 经审查允许提交的精确文件清单 |
-
-提交前执行 `make repository-check`；首次整理文件后先显式暂存，再检查索引。
-`scripts/repository_guard.py --ref HEAD --history` 检查当前提交可达的每一版文件树。
-新增通用文件时需要审查其内容与依赖，再更新白名单；白名单不能替代人工内容审查。
-
-仓库目前保持私有，尚未选择项目开源许可证，也未发布 Plugin。
-第三方组件的许可随各自来源保留，见 [依赖与授权边界](docs/dependencies.md)。
+仓库只纳入通用源码、配置、模板和测试。单期源码、媒体、权重、环境与本地验收工程
+不入库；精确文件边界由 `repository-files.txt`、`make repository-check` 和历史检查保护。
+第三方依赖与项目授权分开，见 [依赖说明](docs/dependencies.md)。

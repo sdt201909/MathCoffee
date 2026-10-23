@@ -13,6 +13,7 @@ docs/README.md
 docs/audience_contract.md
 docs/dependencies.md
 docs/engine_integration.md
+docs/implementation_status.md
 docs/plugin_roadmap.md
 docs/production_workflow.md
 docs/project_interface.md
@@ -35,6 +36,7 @@ engines/remotion/test/assets.test.mjs
 engines/remotion/test/render.test.mjs
 engines/remotion/test/schema.test.mjs
 engines/remotion/test/shorts.test.mjs
+engines/remotion/test/style.test.mjs
 engines/remotion/tsconfig.json
 manim.cfg
 mathcoffee_build.py
@@ -66,6 +68,7 @@ src/mathcoffee/audience.py
 src/mathcoffee/audio_validation.py
 src/mathcoffee/authoring.py
 src/mathcoffee/cli.py
+src/mathcoffee/components.py
 src/mathcoffee/data/audio/music_catalog.json
 src/mathcoffee/data/presets/mathcoffee-longform-v1.json
 src/mathcoffee/data/presets/mathcoffee-shorts-v1.json
@@ -76,6 +79,7 @@ src/mathcoffee/data/speech/voice_profiles.json
 src/mathcoffee/environment.py
 src/mathcoffee/figure_label_contract.py
 src/mathcoffee/music_library.py
+src/mathcoffee/pipeline.py
 src/mathcoffee/plugin_bundle.py
 src/mathcoffee/renderer_contract.py
 src/mathcoffee/resources.py
@@ -88,16 +92,19 @@ src/mathcoffee/speech/qwen_codec_length.py
 src/mathcoffee/speech/qwen_context.py
 src/mathcoffee/style.py
 src/mathcoffee/synthesis.py
+src/mathcoffee/verification.py
 src/mathcoffee/voice.py
 src/mathcoffee/workspace.py
 tests/__init__.py
 tests/test_acoustic_review.py
 tests/test_audience_text.py
 tests/test_cli_runtime.py
+tests/test_components.py
 tests/test_episode_voiceover.py
 tests/test_figure_label_contract.py
 tests/test_music_library.py
 tests/test_native_audio.py
+tests/test_pipeline.py
 tests/test_plugin_bundle.py
 tests/test_project_style.py
 tests/test_qwen_codec_length.py

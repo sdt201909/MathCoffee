@@ -13,6 +13,22 @@ export type Caption = {
   start_frame: number;
   end_frame: number;
 };
+export type Rectangle = [number, number, number, number];
+export type SceneHeader = {id: string; start_frame: number; end_frame: number; title: string; subtitle?: string};
+export type ResolvedStyle = {
+  schema_version: 1;
+  brand: string;
+  colors: Record<string, string>;
+  font: {family: string; fallbacks: string[]; [key: string]: unknown};
+  layout: {
+    safe_rect: Rectangle; title_rect: Rectangle; visual_rect: Rectangle;
+    formula_rect: Rectangle; caption_rect: Rectangle; brand_rect?: Rectangle;
+    font_sizes: {brand: number; title: number; body: number; formula: number; caption: number};
+    caption_enabled: boolean; [key: string]: unknown;
+  };
+  render: {width: number; height: number; fps: number; draft: {width: number; height: number; fps: number}};
+  [key: string]: unknown;
+};
 export type Timeline = {
   schema_version: 1;
   width: number;
@@ -23,6 +39,8 @@ export type Timeline = {
   captions: Caption[];
   audio: {file: string; sample_rate: number; samples: number; sha256: string} | null;
   qa: {anchor_frames: number[]};
+  style?: ResolvedStyle;
+  headers?: SceneHeader[];
 };
 
 function object(value: unknown, name: string): Record<string, unknown> {
@@ -61,6 +79,119 @@ function array(value: unknown, name: string): unknown[] {
 }
 function unique(ids: string[], name: string) {
   if (new Set(ids).size !== ids.length) throw new Error(`${name} IDs must be unique`);
+}
+
+export function presentationText(value: unknown, name: string, empty = false): string {
+  if (typeof value !== 'string' || (!empty && !value.trim()) ||
+      /[\r\u0000-\u0009\u000b-\u001f]/u.test(value) || [...value].length > 4096) {
+    throw new Error(`${name} must be readable text of at most 4096 characters`);
+  }
+  return value;
+}
+function positive(value: unknown, name: string): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+    throw new Error(`${name} must be a positive finite number`);
+  }
+  return value;
+}
+function rectangle(value: unknown, name: string, width: number, height: number): Rectangle {
+  const raw = array(value, name);
+  if (raw.length !== 4 || raw.some(v => typeof v !== 'number' || !Number.isFinite(v))) {
+    throw new Error(`${name} must contain four finite coordinates`);
+  }
+  const [x, y, w, h] = raw as Rectangle;
+  if (x < 0 || y < 0 || w <= 0 || h <= 0 || x + w > width || y + h > height) {
+    throw new Error(`${name} exceeds the style canvas`);
+  }
+  return [x, y, w, h];
+}
+export function parseResolvedStyle(input: unknown, width: number, height: number, fps: number): ResolvedStyle {
+  const raw = object(input, 'style');
+  if (raw.schema_version !== 1) throw new Error('Unsupported style schema_version');
+  const r = object(raw.render, 'style.render');
+  const d = object(r.draft, 'style.render.draft');
+  const render = {width: integer(r.width, 'style width', 2), height: integer(r.height, 'style height', 2),
+    fps: integer(r.fps, 'style fps', 1), draft: {width: integer(d.width, 'draft width', 2),
+      height: integer(d.height, 'draft height', 2), fps: integer(d.fps, 'draft fps', 1)}};
+  if (![render, render.draft].some(v => v.width === width && v.height === height && v.fps === fps)) {
+    throw new Error('Style render/draft dimensions and FPS must match the timeline');
+  }
+  for (const v of [render, render.draft]) {
+    if (v.width % 2 || v.height % 2 || v.fps > 120 || v.width * render.height !== v.height * render.width) {
+      throw new Error('Style render and draft require even dimensions, the same aspect and FPS <= 120');
+    }
+  }
+  const c = object(raw.colors, 'style.colors');
+  const colors: Record<string, string> = {};
+  for (const [key, value] of Object.entries(c)) {
+    if (typeof value !== 'string' || !/^#[a-f0-9]{6}$/iu.test(value)) throw new Error(`style.colors.${key} needs #RRGGBB`);
+    colors[key] = value;
+  }
+  for (const key of ['background', 'text', 'muted', 'object_a', 'object_b', 'result']) {
+    if (!colors[key]) throw new Error(`style.colors.${key} is required`);
+  }
+  const f = object(raw.font, 'style.font');
+  const font = {...f, family: string(f.family, 'style.font.family'),
+    fallbacks: array(f.fallbacks, 'style.font.fallbacks').map(v => string(v, 'font fallback'))};
+  const l = object(raw.layout, 'style.layout');
+  const sizes = object(l.font_sizes, 'style.layout.font_sizes');
+  const font_sizes = {brand: positive(sizes.brand, 'brand font'), title: positive(sizes.title, 'title font'),
+    body: positive(sizes.body, 'body font'), formula: positive(sizes.formula, 'formula font'), caption: positive(sizes.caption, 'caption font')};
+  if (typeof l.caption_enabled !== 'boolean') throw new Error('style.layout.caption_enabled must be boolean');
+  const layout = {...l, font_sizes, caption_enabled: l.caption_enabled,
+    safe_rect: rectangle(l.safe_rect, 'style safe_rect', render.width, render.height),
+    title_rect: rectangle(l.title_rect, 'style title_rect', render.width, render.height),
+    visual_rect: rectangle(l.visual_rect, 'style visual_rect', render.width, render.height),
+    formula_rect: rectangle(l.formula_rect, 'style formula_rect', render.width, render.height),
+    caption_rect: rectangle(l.caption_rect, 'style caption_rect', render.width, render.height),
+    ...(l.brand_rect === undefined ? {} : {brand_rect: rectangle(l.brand_rect, 'style brand_rect', render.width, render.height)})};
+  const brand = presentationText(raw.brand, 'style.brand', true);
+  if (brand.includes('\n')) throw new Error('style.brand must be one line');
+  if (brand && layout.brand_rect && estimatedLines(brand, layout.brand_rect[2], font_sizes.brand) * font_sizes.brand * 1.4 > layout.brand_rect[3]) {
+    throw new Error('Brand exceeds configured brand rectangle; revise brand or style explicitly');
+  }
+  return {...raw, schema_version: 1, brand, colors, font, layout, render};
+}
+export function styleFontStack(style: ResolvedStyle): string {
+  const generic = new Set(['serif', 'sans-serif', 'monospace', 'system-ui', 'cursive', 'fantasy']);
+  return [style.font.family, ...style.font.fallbacks].map(name => generic.has(name) ? name : JSON.stringify(name)).join(', ');
+}
+function estimatedLines(value: string, width: number, fontSize: number): number {
+  return value.split('\n').reduce((total, line) => {
+    const units = [...line].reduce((n, character) => n + (/^[\x20-\x7e]$/u.test(character) ? .62 : 1), 0);
+    return total + Math.max(1, Math.ceil(units * fontSize / width));
+  }, 0);
+}
+export function checkHeaderBudget(header: Pick<SceneHeader, 'title' | 'subtitle'>, style: ResolvedStyle): void {
+  const rect = style.layout.title_rect, sizes = style.layout.font_sizes;
+  const height = estimatedLines(header.title, rect[2], sizes.title) * sizes.title * 1.25 +
+    (header.subtitle ? 12 + estimatedLines(header.subtitle, rect[2], sizes.body) * sizes.body * 1.25 : 0);
+  if (height + 4 > rect[3]) throw new Error('Scene heading exceeds configured title rectangle; revise text or style explicitly');
+}
+export function checkCaptionBudget(value: string, style: ResolvedStyle): void {
+  const rect = style.layout.caption_rect, size = style.layout.font_sizes.caption;
+  if (estimatedLines(value, rect[2], size) * size * 1.25 > rect[3]) {
+    throw new Error('Caption exceeds configured caption rectangle; wrap or revise text explicitly');
+  }
+}
+function headers(value: unknown, total: number, style?: ResolvedStyle): SceneHeader[] {
+  const result = array(value, 'headers').map(value => {
+    const h = object(value, 'header');
+    const id = string(h.id, 'header.id');
+    if (!/^[a-z][a-z0-9_]*$/u.test(id)) throw new Error('Header IDs must be safe lowercase names');
+    const start_frame = integer(h.start_frame, 'header.start_frame');
+    const end_frame = integer(h.end_frame, 'header.end_frame', 1);
+    if (start_frame >= end_frame || end_frame > total) throw new Error('Header exceeds timeline');
+    const header = {id, start_frame, end_frame, title: presentationText(h.title, 'header.title'),
+      ...(h.subtitle === undefined ? {} : {subtitle: presentationText(h.subtitle, 'header.subtitle')})};
+    if (style) checkHeaderBudget(header, style);
+    return header;
+  });
+  unique(result.map(h => h.id), 'Header');
+  for (let i = 1; i < result.length; i++) {
+    if (result[i].start_frame < result[i - 1].end_frame) throw new Error('Headers must be ordered and nonoverlapping');
+  }
+  return result;
 }
 
 export type AspectMode = 'landscape' | 'portrait';
@@ -128,5 +259,12 @@ export function parseTimeline(input: unknown, allowNoAudio = false, aspect: Aspe
       anchor_frames.some((f) => f + 2 > duration_frames)) {
     throw new Error('QA anchors must be unique and leave room for their two-frame flash');
   }
-  return {schema_version: 1, width, height, fps, duration_frames, clips, captions, audio, qa: {anchor_frames}};
+  const style = raw.style === undefined ? undefined : parseResolvedStyle(raw.style, width, height, fps);
+  if (raw.headers !== undefined && raw.scene_headers !== undefined && JSON.stringify(raw.headers) !== JSON.stringify(raw.scene_headers)) {
+    throw new Error('Conflicting header representations');
+  }
+  const rawHeaders = raw.headers ?? raw.scene_headers;
+  if (style?.layout.caption_enabled) captions.forEach(c => checkCaptionBudget(c.text, style));
+  return {schema_version: 1, width, height, fps, duration_frames, clips, captions, audio, qa: {anchor_frames},
+    ...(style === undefined ? {} : {style}), ...(rawHeaders === undefined ? {} : {headers: headers(rawHeaders, duration_frames, style)})};
 }

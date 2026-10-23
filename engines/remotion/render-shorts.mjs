@@ -6,8 +6,10 @@ import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {bundle} from '@remotion/bundler';
 import {openBrowser, selectComposition, renderMedia, renderStill} from '@remotion/renderer';
-import {sha256, resolveAsset} from './render.mjs';
+import {sha256, resolveAsset, muxExactPremix} from './render.mjs';
+export {muxExactPremix} from './render.mjs';
 import {parseShortsTimeline, shortsDisplayEntries} from './src/shorts-schema.ts';
+import {styleFontStack} from './src/schema.ts';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -71,36 +73,6 @@ async function refuseExisting(file) {
   throw new Error(`Refusing to overwrite existing output: ${file}`);
 }
 
-function videoBitstreamHash(file) {
-  const command = ['-v', 'error', '-nostdin', '-i', file, '-map', '0:v:0', '-c:v', 'copy', '-f', 'hash', '-hash', 'sha256', 'pipe:1'];
-  const result = spawnSync('ffmpeg', command, {encoding: 'utf8'});
-  if (result.status !== 0 || !/^SHA256=[a-f0-9]{64}\s*$/u.test(result.stdout)) throw new Error(`Cannot fingerprint copied video packets: ${result.stderr}`);
-  return result.stdout.trim();
-}
-
-export async function muxExactPremix(picture, output, timeline, publicDir) {
-  // Encode the original PCM once with the native FFmpeg muxer, preserving
-  // the authored sample clock and the picture stream without re-encoding.
-  const premix = await resolveAsset(publicDir, timeline.audio.file);
-  if (await sha256(premix) !== timeline.audio.sha256) throw new Error('Premix changed before final mux');
-  const pictureHash = await sha256(picture);
-  const bitstreamBefore = videoBitstreamHash(picture);
-  const command = ['ffmpeg', '-v', 'error', '-nostdin', '-n', '-i', picture, '-i', premix,
-    '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
-    '-ar', '48000', '-ac', '2', '-movflags', '+faststart', output];
-  const result = spawnSync(command[0], command.slice(1), {encoding: 'utf8'});
-  if (result.status !== 0) throw new Error(`Exact premix mux failed: ${result.stderr}`);
-  const bitstreamAfter = videoBitstreamHash(output);
-  if (bitstreamBefore !== bitstreamAfter) throw new Error('Final mux changed video packets');
-  if (pictureHash !== await sha256(picture) || timeline.audio.sha256 !== await sha256(premix)) throw new Error('Picture or premix changed during mux');
-  const version = spawnSync('ffmpeg', ['-version'], {encoding: 'utf8'});
-  if (version.status !== 0) throw new Error('Cannot identify native FFmpeg');
-  return {command, policy: 'one native AAC encode from exact original premix; picture stream copied without re-encoding or retiming',
-    ffmpeg_version: version.stdout.trim(), picture: {file: picture, sha256: pictureHash},
-    premix: {file: premix, sha256: timeline.audio.sha256, samples: timeline.audio.samples},
-    video_bitstream_sha256_before: bitstreamBefore, video_bitstream_sha256_after: bitstreamAfter};
-}
-
 async function main() {
   const invocationCwd = process.cwd();
   const args = argumentsFrom(process.argv.slice(2));
@@ -110,7 +82,10 @@ async function main() {
   const propsBytes = await readFile(args.props);
   const timeline = parseShortsTimeline(JSON.parse(propsBytes), Boolean(args.noAudio) || args['still-frame'] !== undefined);
   if (args.noAudio && timeline.audio) throw new Error('--no-audio requires audio:null; it never silently discards an authored mix');
-  if (args.noCaptions) timeline.shorts.show_captions = false;
+  if (args.noCaptions) {
+    timeline.shorts.show_captions = false;
+    if (timeline.style) timeline.style.layout.caption_enabled = false;
+  }
   const propsSha256 = createHash('sha256').update(propsBytes).digest('hex');
   const effectivePropsSha256 = createHash('sha256').update(JSON.stringify(timeline)).digest('hex');
   const assets = await verifyAssets(timeline, args['public-dir']);
@@ -167,10 +142,11 @@ async function main() {
     command: [process.execPath, ...process.argv.slice(1)], invocation_cwd: invocationCwd, renderer_cwd: root,
     remotion_version: require('remotion/package.json').version, node_version: process.version, platform: process.platform, arch: process.arch,
     browser_version: browserVersionResult.stdout.trim(), browser_executable: browserOptions.browserExecutable, browser_sha256: await sha256(browserOptions.browserExecutable),
-    font_stack: 'Heiti SC, PingFang SC, Hiragino Sans GB, sans-serif', props: {file: args.props, sha256: propsSha256, effective_sha256: effectivePropsSha256},
+    font_stack: timeline.style ? styleFontStack(timeline.style) : 'Heiti SC, PingFang SC, Hiragino Sans GB, sans-serif', props: {file: args.props, sha256: propsSha256, effective_sha256: effectivePropsSha256},
     renderer_sources: sourceHashes, assets, audio_mux: audioMux,
     parameters: {concurrency: 2, offthread_video_cache_bytes: 268435456, codec: 'h264', pixel_format: 'yuv420p', crf: 18, preset: 'medium', audio_codec: 'aac', sample_rate: 48000, license_key_set: false, show_captions: timeline.shorts.show_captions, still_frame: isStill ? Number(args['still-frame']) : null},
     expected: {width: timeline.width, height: timeline.height, fps: timeline.fps, frames: timeline.duration_frames, duration_seconds: timeline.duration_frames / timeline.fps, has_audio: !isStill && Boolean(timeline.audio)},
+    caption_roi_at_style_canvas: timeline.style ? {x: timeline.style.layout.caption_rect[0], y: timeline.style.layout.caption_rect[1], width: timeline.style.layout.caption_rect[2], height: timeline.style.layout.caption_rect[3], font_size: timeline.style.layout.font_sizes.caption, canvas_width: timeline.style.render.width, canvas_height: timeline.style.render.height} : null,
     caption_roi_at_1080x1920: {x: 80, y: 1514, width: 830, height: 160, font_size: 45, max_lines: 2, max_characters_per_line: 18},
     qa_anchor_roi_at_1080x1920: {x: 960, y: 120, width: 24, height: 24, duration_frames: 2},
     display_manifest_fragment: `${args.output}.display.json`,

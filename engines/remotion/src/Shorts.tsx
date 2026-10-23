@@ -1,6 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Html5Audio, OffthreadVideo, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import type {FrameSpan, ShortsTimeline} from './shorts-schema';
+import {styleFontStack} from './schema';
 
 const C = {bg: '#080D16', panel: '#0C121D', line: '#294354', cyan: '#70E1E8', gold: '#FFD166', text: '#F4F7FB', muted: '#9CAABD'};
 const FONT = 'Heiti SC, PingFang SC, Hiragino Sans GB, sans-serif';
@@ -11,11 +12,42 @@ export const Shorts: React.FC<ShortsTimeline> = props => {
   const frame = useCurrentFrame();
   const s = props.shorts;
   const header = s.scene_headers.find(h => active(h, frame));
-  const caption = s.show_captions ? props.captions.find(c => active(c, frame)) : undefined;
+  const style = props.style;
+  const caption = (style ? style.layout.caption_enabled : s.show_captions) ? props.captions.find(c => active(c, frame)) : undefined;
   const footer = active(s.footer, frame) ? s.footer : undefined;
   const closing = active(s.closing, frame) ? s.closing : undefined;
   const black = s.black_from_frame !== undefined && frame >= s.black_from_frame;
   const flash = props.qa.anchor_frames.some(f => frame >= f && frame < f + 2);
+  if (style) {
+    const r = style.layout, sizes = r.font_sizes, colors = style.colors;
+    const title = r.title_rect, captionRect = r.caption_rect, formula = r.formula_rect;
+    const brandRect = r.brand_rect ?? [r.safe_rect[0], r.safe_rect[1], r.safe_rect[2], sizes.brand * 1.5];
+    return <AbsoluteFill style={{backgroundColor: black ? '#000000' : colors.background}}>
+      {props.audio && <Html5Audio src={staticFile(props.audio.file)} />}
+      {!black && <>
+        {props.clips.map(clip => <Sequence key={clip.id} from={clip.start_frame} durationInFrames={clip.duration_frames}>
+          <OffthreadVideo src={staticFile(clip.file)} trimBefore={clip.source_in_frame} durationInFrames={clip.duration_frames} muted style={{width: '100%', height: '100%', objectFit: 'contain'}} />
+        </Sequence>)}
+        <div style={{position: 'absolute', width: style.render.width, height: style.render.height, transform: `scale(${props.width / style.render.width})`, transformOrigin: 'top left', fontFamily: styleFontStack(style), color: colors.text}}>
+          {style.brand && header && <div style={{position: 'absolute', left: brandRect[0], top: brandRect[1], width: brandRect[2], height: brandRect[3], fontSize: sizes.brand, lineHeight: 1.4, color: colors.muted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{style.brand}</div>}
+          {header && <div style={{position: 'absolute', left: title[0], top: title[1], width: title[2], height: title[3]}}>
+            <div style={{fontSize: sizes.title, lineHeight: 1.25, fontWeight: 600, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{header.title}</div>
+            {header.subtitle && <div style={{marginTop: 12, fontSize: sizes.body, lineHeight: 1.25, color: colors.muted, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{header.subtitle}</div>}
+            <div style={{position: 'absolute', left: 0, bottom: 0, width: 80, height: 3, background: colors.object_b}} />
+          </div>}
+          {closing && <div style={{position: 'absolute', left: formula[0], top: formula[1], width: formula[2], height: formula[3], textAlign: 'center'}}>
+            <div style={{fontSize: sizes.formula, lineHeight: 1.25, color: colors.result}}>{closing.title}</div>
+            {closing.lines.map((line, i) => <div key={i} style={{fontSize: sizes.body, marginTop: 12, lineHeight: 1.25}}>{line}</div>)}
+          </div>}
+          {caption && <div style={{position: 'absolute', left: captionRect[0], top: captionRect[1], width: captionRect[2], height: captionRect[3], display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.background}}>
+            <div style={{width: '100%', fontSize: sizes.caption, lineHeight: 1.25, fontWeight: 500, textAlign: 'center', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{caption.text}</div>
+          </div>}
+          {footer && <div style={{position: 'absolute', left: formula[0], top: formula[1] + formula[3] - sizes.body * 1.5, width: formula[2], fontSize: sizes.body, lineHeight: 1.25, textAlign: 'center'}}>{footer.text}</div>}
+          {flash && <div style={{position: 'absolute', left: style.render.width - 120, top: 120, width: 24, height: 24, background: '#FFFFFF'}} />}
+        </div>
+      </>}
+    </AbsoluteFill>;
+  }
   return <AbsoluteFill style={{backgroundColor: black ? '#000000' : C.bg}}>
     {props.audio && <Html5Audio src={staticFile(props.audio.file)} />}
     {!black && <>

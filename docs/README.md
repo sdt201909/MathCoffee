@@ -6,13 +6,20 @@
 |---|---|
 | [Agent 约定](../AGENTS.md) | 工作区保护、独立环境、审查与可恢复清理 |
 | [制作流程](production_workflow.md) | 从 brief 到可核验交付 |
+| [创作与配置接口](project_interface.md) | 用户工作区、Authoring v1、CLI 与构建恢复 |
+| [候选风格基线](style_baseline.md) | 横竖屏预设、语义颜色、节奏与确认边界 |
 | [受众约定](audience_contract.md) | 问题链、显示文案与片尾边界 |
 | [双引擎接口](engine_integration.md) | 同一时间轴、素材契约与渲染入口 |
 | [配音管线](voice_pipeline.md) | 本地 provider、词典、真实句窗与试听边界 |
 | [依赖与授权边界](dependencies.md) | 运行时锁、第三方声明与待审项目 |
-| [Plugin 路线图](plugin_roadmap.md) | 当前能力、后续拆分和发布前要求 |
+| [实施与验收状态](implementation_status.md) | 已实现内容、验证范围与仍待完成的门槛 |
+| [Plugin 路线图](plugin_roadmap.md) | 分阶段目标和发布前要求 |
 | [仓库边界](repository_scope.md) | 文件白名单、历史隔离与后续提交方式 |
 
 制作一期时，在本地工程建立本期 brief 和唯一 authoring 来源；数学说明、旁白、
 实际句窗、场景与交付记录使用相同稳定 ID。文档里的 `episode`、`example` 是占位名，
 对应文件由具体制作任务提供，仓库没有内置成片样例。
+
+安装者先按根 [README](../README.md) 建立独立工作区，再填写创作源。框架代码、运行时、
+模型缓存与用户作品分开存放；不能把插件目录当作本期工程。候选预设尚待作者看片与
+听音确认，安装或自动检查成功均不代表这一门槛已经完成。

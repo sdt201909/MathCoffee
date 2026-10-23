@@ -82,7 +82,8 @@ def _ordered_intervals(records: list, total: int, name: str) -> None:
         previous = end
 
 
-def validate_timeline(data: dict, asset_directory: Path, *, inspect_media: bool = True) -> dict:
+def validate_timeline(data: dict, asset_directory: Path, *, inspect_media: bool = True,
+                      allow_no_audio: bool = False) -> dict:
     """Validate the immutable manifest and optionally inspect real media headers.
 
     End frames are exclusive. v1 uses integral frame rates; nonintegral rates
@@ -132,24 +133,28 @@ def validate_timeline(data: dict, asset_directory: Path, *, inspect_media: bool 
         if not isinstance(caption.get("text"), str) or not caption["text"].strip():
             raise ValueError("caption text must be nonempty")
     audio = data.get("audio")
-    if not isinstance(audio, dict):
-        raise ValueError("one final mixed audio asset is required")
-    rate = _integer(audio.get("sample_rate"), "audio.sample_rate", 1)
-    samples = _integer(audio.get("samples"), "audio.samples", 1)
-    if rate != 48000 or Fraction(samples, rate) != Fraction(total, fps):
-        raise ValueError("audio must contain exactly the timeline duration at 48000 Hz")
-    path, asset = _asset(audio, asset_directory)
-    if inspect_media:
-        probe = probe_media(path)
-        streams = [s for s in probe["streams"] if s["codec_type"] == "audio"]
-        if len(streams) != 1 or any(s["codec_type"] == "video" for s in probe["streams"]):
-            raise ValueError("mixed audio asset must have exactly one audio stream and no video")
-        stream = streams[0]
-        measured = Fraction(stream["duration_ts"]) * Fraction(stream["time_base"]) * rate
-        if int(stream["sample_rate"]) != rate or stream["channels"] != 2 or measured != samples:
-            raise ValueError("mixed audio header differs from declared sample rate/count/channels")
-        asset["probe"] = probe
-    assets.append(asset)
+    samples = 0
+    if audio is None and allow_no_audio:
+        pass
+    else:
+        if not isinstance(audio, dict):
+            raise ValueError("one final mixed audio asset is required")
+        rate = _integer(audio.get("sample_rate"), "audio.sample_rate", 1)
+        samples = _integer(audio.get("samples"), "audio.samples", 1)
+        if rate != 48000 or Fraction(samples, rate) != Fraction(total, fps):
+            raise ValueError("audio must contain exactly the timeline duration at 48000 Hz")
+        path, asset = _asset(audio, asset_directory)
+        if inspect_media:
+            probe = probe_media(path)
+            streams = [s for s in probe["streams"] if s["codec_type"] == "audio"]
+            if len(streams) != 1 or any(s["codec_type"] == "video" for s in probe["streams"]):
+                raise ValueError("mixed audio asset must have exactly one audio stream and no video")
+            stream = streams[0]
+            measured = Fraction(stream["duration_ts"]) * Fraction(stream["time_base"]) * rate
+            if int(stream["sample_rate"]) != rate or stream["channels"] != 2 or measured != samples:
+                raise ValueError("mixed audio header differs from declared sample rate/count/channels")
+            asset["probe"] = probe
+        assets.append(asset)
     anchors = data.get("qa", {}).get("anchor_frames", [])
     if not isinstance(anchors, list) or len(set(anchors)) != len(anchors):
         raise ValueError("QA anchor frames must be a unique list")
@@ -169,7 +174,7 @@ def validate_timeline(data: dict, asset_directory: Path, *, inspect_media: bool 
         "captions": len(captions),
         "assets": assets,
         "boundaries": "[start_frame, end_frame)",
-        "mixed_audio_owner": "upstream mixer",
+        "mixed_audio_owner": "none" if audio is None else "upstream mixer",
         "caption_owner": "final composition",
         "media_headers_inspected": inspect_media,
     }
