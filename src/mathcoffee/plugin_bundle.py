@@ -23,7 +23,7 @@ SHARED_FILES = (
     *(f"docs/{name}{language}.md" for name in (
         "README", "installation", "audience_contract", "dependencies", "engine_integration",
         "implementation_status", "plugin_roadmap", "production_workflow", "project_interface",
-        "repository_scope", "style_baseline", "voice_pipeline",
+        "repository_scope", "style_baseline", "voice_pipeline", "website",
     ) for language in ("", ".zh-CN")),
     "AGENTS.md", "AGENTS.zh-CN.md",
     *(f"skills/{name}/SKILL.md" for name in SKILL_NAMES),

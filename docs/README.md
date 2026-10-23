@@ -19,6 +19,7 @@ include the channel's episode scenes, scripts, media, or delivery records.
 | [Implementation and acceptance status](implementation_status.md) | Implemented capabilities, validation scope, and remaining acceptance gates |
 | [Plugin roadmap](plugin_roadmap.md) | Staged goals and release-readiness requirements |
 | [Repository scope](repository_scope.md) | The file allowlist, history isolation, and future commits |
+| [Website maintenance](website.md) | Bilingual pages, browser checks, release links, and GitHub Pages deployment |
 | [Contributing](../CONTRIBUTING.md) | Community changes, checks, and review expectations |
 
 For each video, create a brief and a single authoring source in a local project.

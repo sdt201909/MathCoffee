@@ -1,0 +1,9 @@
+{
+  "version": "0.2.0-alpha.2",
+  "tag": "v0.2.0-alpha.2",
+  "repository": "https://github.com/sdt201909/MathCoffee",
+  "downloads": {
+    "codex": "https://github.com/sdt201909/MathCoffee/releases/download/v0.2.0-alpha.2/mathcoffee-codex-0.2.0a2.zip",
+    "claude": "https://github.com/sdt201909/MathCoffee/releases/download/v0.2.0-alpha.2/mathcoffee-claude-0.2.0a2.zip"
+  }
+}

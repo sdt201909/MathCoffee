@@ -18,6 +18,7 @@
 | [实施与验收状态](implementation_status.zh-CN.md) | 已实现内容、验证范围与仍待完成的门槛 |
 | [Plugin 路线图](plugin_roadmap.zh-CN.md) | 分阶段目标和发布前要求 |
 | [仓库边界](repository_scope.zh-CN.md) | 文件白名单、历史隔离与后续提交方式 |
+| [主页维护](website.zh-CN.md) | 双语页面、浏览器检查、版本入口与 GitHub Pages 部署 |
 | [参与贡献](../CONTRIBUTING.zh-CN.md) | 社区改动、检查和审查约定 |
 
 制作一期时，在本地工程建立本期 brief 和唯一 authoring 来源；数学说明、旁白、

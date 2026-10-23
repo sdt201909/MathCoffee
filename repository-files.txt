@@ -6,6 +6,7 @@
 .github/ISSUE_TEMPLATE/feature_request.yml
 .github/PULL_REQUEST_TEMPLATE.md
 .github/workflows/ci.yml
+.github/workflows/pages.yml
 .gitignore
 .python-version
 AGENTS.md
@@ -49,6 +50,8 @@ docs/style_baseline.md
 docs/style_baseline.zh-CN.md
 docs/voice_pipeline.md
 docs/voice_pipeline.zh-CN.md
+docs/website.md
+docs/website.zh-CN.md
 engines/remotion/.gitignore
 engines/remotion/README.md
 engines/remotion/README.zh-CN.md
@@ -87,6 +90,18 @@ scripts/synthesize_voice.py
 scripts/validate_figure_labels.py
 scripts/validate_media.py
 scripts/validate_renderer_timeline.py
+site/app.js
+site/browser.test.mjs
+site/build.mjs
+site/build.test.mjs
+site/content.mjs
+site/package-lock.json
+site/package.json
+site/page.mjs
+site/preferences.js
+site/preview.mjs
+site/release.json
+site/styles.css
 skills/create/SKILL.md
 skills/create/references/workflow.md
 skills/review/SKILL.md

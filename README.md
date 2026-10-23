@@ -2,6 +2,12 @@ English | [简体中文](README.zh-CN.md)
 
 # MathCoffee · 知数咖啡厅
 
+[Website](https://sdt201909.github.io/MathCoffee/) ·
+[Get started](https://sdt201909.github.io/MathCoffee/en/#get-started) ·
+[Community](https://github.com/sdt201909/MathCoffee/discussions)
+
+**Mathematics belongs to everyone.**
+
 An agent-native toolkit for making mathematics videos locally with **Codex or
 Claude Code**. Start from one authoring source; use Manim for mathematical scenes,
 Remotion for composition, and measured narration for the shared timeline.

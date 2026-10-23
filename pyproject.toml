@@ -32,7 +32,7 @@ build-backend = "mathcoffee_build"
 backend-path = ["."]
 
 [tool.uv.build-backend]
-source-include = [".gitignore", ".python-version", "Makefile", "manim.cfg", "mathcoffee_build.py", "repository-files.txt", "engines/remotion/**", "toolchains/**", "skills/**", "bin/**", "plugin.json", ".claude-plugin/**", ".agents/**", "uv.lock", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES*.md", "README.zh-CN.md", "CONTRIBUTING*.md", "SECURITY*.md", "Brewfile", "AGENTS*.md", "docs/**", "tests/**", "scripts/**", ".github/**"]
+source-include = [".gitignore", ".python-version", "Makefile", "manim.cfg", "mathcoffee_build.py", "repository-files.txt", "engines/remotion/**", "toolchains/**", "skills/**", "bin/**", "plugin.json", ".claude-plugin/**", ".agents/**", "uv.lock", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES*.md", "README.zh-CN.md", "CONTRIBUTING*.md", "SECURITY*.md", "Brewfile", "AGENTS*.md", "docs/**", "tests/**", "scripts/**", ".github/**", "site/**"]
 source-exclude = ["node_modules", "__pycache__", ".npm-cache", ".cache", "out", "*.pyc"]
 
 [tool.ruff]

@@ -2,6 +2,12 @@
 
 # MathCoffee · 知数咖啡厅
 
+[项目主页](https://sdt201909.github.io/MathCoffee/) ·
+[开始创作](https://sdt201909.github.io/MathCoffee/zh/#get-started) ·
+[社区交流](https://github.com/sdt201909/MathCoffee/discussions)
+
+**数学应是大众的，而非特权。**
+
 面向 **Codex 与 Claude Code**、在本地运行的 Agent-Native 数学视频制作工具。
 以一份 authoring 创作来源驱动 Manim 数学场景、Remotion 编排，以及由实际旁白决定的共同时间轴。
 
