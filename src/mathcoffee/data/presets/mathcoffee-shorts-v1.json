@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "preset_version": 1,
+  "brand": "",
+  "font": {
+    "family": "Heiti SC",
+    "fallbacks": [
+      "PingFang SC",
+      "Hiragino Sans GB",
+      "sans-serif"
+    ],
+    "formula": "Latin Modern Math"
+  },
+  "pacing": {
+    "formula_min_seconds": 6,
+    "conclusion_min_seconds": 6,
+    "transition_seconds": 0.4,
+    "read_hold_seconds": 1
+  },
+  "voice": {
+    "provider": "qwen_mlx",
+    "profile": "science_female",
+    "speaker": "Serena",
+    "language": "auto",
+    "text_conditioning": "full_text",
+    "seed": 42,
+    "temperature": 0.5,
+    "top_k": 50,
+    "top_p": 1.0,
+    "repetition_penalty": 1.05,
+    "max_tokens": 1024,
+    "stream": false,
+    "instruct": "请用清晰、理性、自然的科普讲述语气朗读，语速适中略快、均匀稳定，停顿简洁，句尾干净。"
+  },
+  "music": {
+    "enabled": true,
+    "duck_db": 14,
+    "gain_db": 0,
+    "theme": "mathematics",
+    "mood": "curious",
+    "section": "explanation",
+    "seed": 281
+  },
+  "narrative": {
+    "audience": "具备高中数学基础的观众",
+    "opening": "先呈现能理解的问题或可观察的差异，再引入概念。",
+    "progression": [
+      "问题",
+      "已有结果",
+      "剩余障碍",
+      "下一工具的必要性"
+    ],
+    "closing": "回扣开场问题，给出结论、适用条件与观众可读参考。"
+  },
+  "preset_id": "mathcoffee-shorts@1",
+  "colors": {
+    "background": "#070C13",
+    "text": "#F4F7FB",
+    "muted": "#9CAABD",
+    "object_a": "#4EA1FF",
+    "object_b": "#70E1E8",
+    "result": "#FFD166",
+    "success": "#86D9A5",
+    "failure": "#F08888",
+    "auxiliary": "#355F78"
+  },
+  "layout": {
+    "safe_rect": [
+      80,
+      88,
+      830,
+      1652
+    ],
+    "title_rect": [
+      80,
+      160,
+      830,
+      170
+    ],
+    "visual_rect": [
+      80,
+      380,
+      830,
+      820
+    ],
+    "formula_rect": [
+      80,
+      1220,
+      830,
+      260
+    ],
+    "caption_rect": [
+      80,
+      1514,
+      830,
+      160
+    ],
+    "font_sizes": {
+      "brand": 27,
+      "title": 49,
+      "body": 35,
+      "formula": 48,
+      "caption": 45
+    },
+    "caption_enabled": false,
+    "brand_rect": [
+      80,
+      88,
+      830,
+      48
+    ]
+  },
+  "render": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "draft": {
+      "width": 540,
+      "height": 960,
+      "fps": 30
+    }
+  }
+}

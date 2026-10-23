@@ -1,4 +1,4 @@
-# Reviewed reusable framework files; changes require content and dependency review.
+# Reviewed framework files; no episode sources, production media or local runtimes.
 .gitignore
 .python-version
 AGENTS.md
@@ -16,6 +16,7 @@ docs/engine_integration.md
 docs/plugin_roadmap.md
 docs/production_workflow.md
 docs/repository_scope.md
+docs/style_baseline.md
 docs/voice_pipeline.md
 engines/remotion/.gitignore
 engines/remotion/README.md
@@ -53,9 +54,13 @@ scripts/validate_media.py
 scripts/validate_renderer_timeline.py
 src/mathcoffee/__init__.py
 src/mathcoffee/audio_validation.py
+src/mathcoffee/authoring.py
+src/mathcoffee/data/presets/mathcoffee-longform-v1.json
+src/mathcoffee/data/presets/mathcoffee-shorts-v1.json
 src/mathcoffee/figure_label_contract.py
 src/mathcoffee/music_library.py
 src/mathcoffee/renderer_contract.py
+src/mathcoffee/resources.py
 src/mathcoffee/speech/__init__.py
 src/mathcoffee/speech/acoustic_review.py
 src/mathcoffee/speech/planning.py
@@ -63,6 +68,8 @@ src/mathcoffee/speech/providers.py
 src/mathcoffee/speech/qwen_alignment.py
 src/mathcoffee/speech/qwen_codec_length.py
 src/mathcoffee/speech/qwen_context.py
+src/mathcoffee/style.py
+src/mathcoffee/workspace.py
 tests/__init__.py
 tests/test_acoustic_review.py
 tests/test_audience_text.py
@@ -70,6 +77,7 @@ tests/test_episode_voiceover.py
 tests/test_figure_label_contract.py
 tests/test_music_library.py
 tests/test_native_audio.py
+tests/test_project_style.py
 tests/test_qwen_codec_length.py
 tests/test_qwen_context.py
 tests/test_renderer_contract.py
