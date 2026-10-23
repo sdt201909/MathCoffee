@@ -13,8 +13,14 @@ fi
 
 runtime_base="${MATHCOFFEE_DATA_HOME:-${MATHCOFFEE_RUNTIME_DIR:-$HOME/Library/Application Support/MathCoffee}}"
 runtime_python="$runtime_base/core/bin/python"
-if [ -f "$runtime_base/runtime.json" ] && command -v python3 >/dev/null 2>&1; then
-  if ! runtime_python=$(python3 -I -c 'import json,sys; config=json.load(open(sys.argv[1], encoding="utf-8")); assert isinstance(config,dict); value=config.get("core_python",sys.argv[2]); assert isinstance(value,str) and value and "\n" not in value; print(value)' "$runtime_base/runtime.json" "$runtime_python" 2>/dev/null); then
+runtime_reader=""
+if [ -x /opt/homebrew/opt/python@3.13/bin/python3.13 ]; then
+  runtime_reader=/opt/homebrew/opt/python@3.13/bin/python3.13
+elif command -v python3 >/dev/null 2>&1; then
+  runtime_reader=$(command -v python3)
+fi
+if [ -f "$runtime_base/runtime.json" ] && [ -n "$runtime_reader" ]; then
+  if ! runtime_python=$("$runtime_reader" -I -c 'import json,sys; config=json.load(open(sys.argv[1], encoding="utf-8")); assert isinstance(config,dict); value=config.get("core_python",sys.argv[2]); assert isinstance(value,str) and value and "\n" not in value; print(value)' "$runtime_base/runtime.json" "$runtime_python" 2>/dev/null); then
     printf '%s\n' '{"status":"setup_required","reason":"Invalid MathCoffee runtime.json core_python; select an external runtime with MATHCOFFEE_PYTHON."}' >&2
     exit 3
   fi

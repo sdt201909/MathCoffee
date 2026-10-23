@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a reusable improvement. English or Chinese is welcome.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Focus on a reusable production need rather than one private episode.
+        [Roadmap](https://github.com/sdt201909/MathCoffee/blob/main/docs/plugin_roadmap.md) · [中文路线图](https://github.com/sdt201909/MathCoffee/blob/main/docs/plugin_roadmap.zh-CN.md)
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What is difficult today, and who would benefit?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Give a concrete example and explain configuration or workflow changes.
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and alternatives
+      description: Hosts, engines, authoring/style contracts, local dependencies, cost or network implications, and alternatives considered.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence
+      description: How could a small synthetic test or local sample demonstrate the improvement? Distinguish technical checks from mathematical, visual, style or listening review.

@@ -1,8 +1,15 @@
 {
   "name": "mathcoffee",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "description": "Create and review mathematics videos with configurable MathCoffee visual, narrative and local audio workflows.",
-  "author": {"name": "MathCoffee"},
+  "author": {
+    "name": "MathCoffee"
+  },
   "repository": "https://github.com/sdt201909/MathCoffee",
-  "keywords": ["mathematics", "video", "manim", "remotion"]
+  "keywords": [
+    "mathematics",
+    "video",
+    "manim",
+    "remotion"
+  ]
 }

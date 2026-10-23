@@ -1,70 +1,104 @@
-# 0.2.0a1 实施与验收状态
+# Implementation and acceptance status
 
-此文记录 Plugin 改造候选版的能力和验证边界。代码完成、自动测试、真实媒体检查与
-作者确认分别记录。当前不是所有阶段已获验收的公开发行版；项目尚未选择开源许可证。
+English | [简体中文](implementation_status.zh-CN.md)
 
-## 已实现的通用能力
+The community release is **v0.2.0-alpha.2** (Python `0.2.0a2`), with project source
+licensed under [Apache-2.0](../LICENSE). A source release does not mean every
+production stage has passed acceptance. This document distinguishes implemented
+code, automated checks, real-media inspection, and the author's approval.
+Third-party dependencies, models, fonts, and media retain their own terms; see
+[dependencies](dependencies.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).
 
-| 范围 | 当前实现 |
+## Implemented framework capabilities
+
+| Area | Current implementation |
 |---|---|
-| 独立安装 | 带 CLI 入口的 wheel 汇集只读包资源、声音配置、Remotion 与工具链锁文件；构建使用文件白名单 |
-| 用户工作区 | 安装目录、外部运行时／缓存和用户作品分开；带空格路径可用，初始化拒绝覆盖现有目录 |
-| 环境准备 | `setup` 默认只返回计划；显式执行时分离 Python 3.13 渲染与 Python 3.12 配音，保存身份与恢复回执 |
-| 规划与创作数据 | 无模型、无渲染依赖可运行 `doctor/init/plan`；Authoring v1 及旧结构适配派生共同请求与时间轴 |
-| 风格与品牌 | 横竖屏候选预设、严格配置覆盖与差异记录；颜色、字体、版式、停留、声音、配乐和品牌各自可配 |
-| 数学画面与编排 | 通用 Manim 组件和 Remotion 共用解析风格，登记显示文字、真实边界和动作锚点；未知组件或动作拒绝静默降级 |
-| 声音与混音 | 本地 Qwen 合成、逐句 PCM 导入、显式无声；由实际活动窗安排句窗与配乐避让，保留原文和归一化依据 |
-| 构建与恢复 | 哈希绑定的分阶段收据、选择性片段复用、失败现场保留；依赖或正文变更后拒绝把旧产物当作当前结果 |
-| 容器验收 | 完整帧解码与时间戳、尺寸／帧率／帧数、实际音轨时钟和同步、声明字幕窗口及输出哈希 |
-| 两套宿主包 | Codex 与 Claude Code 独立 manifest／marketplace，复用 setup、create、review、revise 技能与同一 CLI |
+| Independent installation | A wheel with a CLI entry point includes read-only package resources, voice configuration, Remotion, and toolchain lock files; builds use a reviewed file allowlist |
+| User workspaces | Installation, external runtimes/caches, and user work are separate; paths with spaces are supported, and initialization refuses to overwrite existing directories |
+| Environment preparation | `setup` returns a plan by default; explicit execution separates Python 3.13 rendering and Python 3.12 speech, retaining identities and resumable installation receipts |
+| Planning and authoring | `doctor/init/plan` work without models or rendering dependencies; Authoring v1 and explicit legacy adapters derive common requests and timelines |
+| Style and branding | Portrait/landscape candidate presets, strict overrides, and recorded differences; colors, fonts, layout, holds, voice, music, and branding are configurable |
+| Mathematical scenes and composition | Generic Manim components and Remotion share the resolved style, register displayed text, real bounds, and action anchors, and reject unknown components/actions instead of silently degrading |
+| Voice and mixing | Local Qwen synthesis, per-sentence PCM import, and explicit silence; measured activity windows drive sentence timing and music ducking, with original text and normalization evidence retained |
+| Builds and recovery | Hash-bound stage receipts, selective clip reuse, and retained failure evidence; changed dependencies or text prevent old outputs from being treated as current |
+| Container verification | Complete frame decoding and timestamps, dimensions/FPS/frame count, actual audio-track clock and synchronization, declared caption windows, and output hashes |
+| Two host packages | Separate Codex and Claude Code manifests/marketplaces share the setup, create, review, and revise skills and the same CLI |
 
-用户工程仍需提供本题的数学模型、论述和合法资产。通用组件不会证明任意新题材正确，
-也不会自动把教学动作编造成已发生事件。预设标记为 `pending_author_confirmation`，
-不能据此宣布新作品已达到作者认可的风格。
+A user project still supplies the topic's mathematical model, argument, and
+properly licensed assets. Generic components do not prove arbitrary new topics
+correct or invent teaching actions and claim they occurred. Presets remain
+`pending_author_confirmation`; that label does not establish that a new work
+matches the author's approved style.
 
-## 已执行的验证
+## Recorded 0.2.0a1 baseline validation
 
-本轮在已有 Apple Silicon Mac 上复用现存独立环境，没有升级历史制作依赖，也没有
-向仓库加入单期视频代码、媒体或模型。测试对象为通用组件与生成型夹具。
+The following evidence belongs to the **0.2.0a1 implementation candidate** before
+the community release. It was collected on an existing Apple Silicon Mac using
+separate, already installed environments. Historical production dependencies
+were not upgraded. No episode code, media, or models were added to the repository.
+Tests use generic components and generated fixtures.
 
-| 验证 | 已知结果与范围 |
+| Validation | Recorded result and scope |
 |---|---|
-| Python core | 168 项通过，覆盖工作区／规划／风格、CLI、包资源、组件、恢复、契约与宿主包边界 |
-| 独立配音环境 | 40 项通过，覆盖输入、节奏、声音一致性与补录逻辑；不代表实际听感获认可 |
-| 独立声音 QA 环境 | 4 项通过，验证代理指标逻辑；不代替听音 |
-| Remotion | 25 项 Node 测试与 TypeScript 检查通过，覆盖 v1 兼容、版式配置和输入边界 |
-| wheel 基础冒烟 | 在源码之外、无渲染依赖的 core 环境完成初始化、规划、准备计划和诊断；只读安装资源未被修改 |
-| Codex 宿主 | 最终候选 ZIP 在隔离配置中完成 marketplace 添加、安装／启用／移除；插件运行期间保持原样，卸载后 core 与用户工程哈希不变 |
-| Claude Code 宿主 | manifest、包结构与启动器经过自动检查；本机没有可用 Claude Code，真实加载未执行 |
+| Python core | 168 passed, covering workspaces/planning/style, CLI, package resources, components, recovery, contracts, and host package boundaries |
+| Separate speech environment | 40 passed, covering input, pacing, voice consistency, and retakes; this does not imply approved audible quality |
+| Separate voice QA environment | 4 passed, checking proxy-metric logic; this does not replace listening |
+| Remotion | 25 Node tests and TypeScript checking passed, covering v1 compatibility, layout configuration, and input boundaries |
+| Wheel smoke test | Initialization, planning, setup plans, and diagnosis completed outside the source tree in a core environment without rendering dependencies; read-only installation resources were unchanged |
+| Codex host | The final candidate ZIP completed marketplace add, install/enable, and remove in isolated configuration; plugin files were unchanged during the workflow, and core/project hashes were unchanged after removal |
+| Claude Code host | Manifests, package structure, and launcher passed automated checks; Claude Code was unavailable on the test machine, so actual host loading was not performed |
 
-安装冒烟、宿主测试与真实渲染分别绑定各自构建产物。前一轮候选 wheel 的通过记录，
-不能替代最终发行 wheel 的身份核验。具体本地媒体、产物哈希和执行日志由本轮交付报告
-记录；仓库不携带本地验收工程或历史作品。
+Installation smoke tests, host tests, and real rendering each bind to their own
+artifact identity. A passing earlier wheel does not validate a later release
+wheel. The baseline's local delivery report records the exact media, hashes,
+and command logs; this repository does not carry local acceptance projects or
+historical episodes. Release-specific changes require their own checks against
+the new build, rather than relabeling this baseline as alpha.2 evidence.
 
-最终候选 wheel 已在没有 NumPy、Manim、PyAV 或 SoundFile 的独立 core 环境运行；
-渲染与声音使用另行配置的现有环境。只读安装目录之外完成了两套 22.8 秒、684 帧的
-真实低清样段：竖屏 540×960／30、默认不烧录旁白字幕；横屏 960×540／30、独立启用
-字幕。两者均完成完整解码、时间戳、原始混音与最终 AAC 音轨同步检查，逐句偏移为0；
-横屏还检查了591个声明字幕活动帧。源码包重建 wheel 与直接构建的 wheel 哈希相同。只读安装目录的78份资源哈希保持
-不变；恢复命中同一构建，未批准的高清入口按预期拒绝执行。
+The final baseline wheel ran in a separate core environment with no NumPy,
+Manim, PyAV, or SoundFile installed. Rendering and speech used separately
+configured existing environments. Two real, low-resolution samples were
+produced outside the read-only installation: each was 22.8 seconds and 684 frames.
+Portrait output was 540×960 at 30 fps with narration captions off by default;
+landscape output was 960×540 at 30 fps with its own caption policy enabled.
+Both passed complete decoding, timestamp checks, and synchronization of the final
+AAC track against the original premix, with zero measured per-sentence offset.
+The landscape sample additionally checked 591 declared active-caption frames.
+The wheel rebuilt from the source distribution had the same hash as the direct
+wheel build. All 78 resource hashes in the read-only installation stayed
+unchanged. Resume reused the same build, and an unapproved final-render request
+was rejected as expected.
 
-编码中间帧和相邻场景交接作了抽样检查，未见标签／公式裁切；未实际听审，未人工
-逐秒看完，也未由作者确认风格。样段的题材、配音、完整视频代码与原始回执只留在
-本地验收工程。它们验证技术闭环，不等于完整新题材作品或三章长片验收。
+Encoded intermediate frames and adjacent-scene transitions were sampled without
+observed label/formula cropping. Actual listening, a human second-by-second
+review, and the author's style approval were not performed. Sample topics,
+voice files, complete video code, and raw receipts remain only in the local
+acceptance project. They demonstrate the technical loop, not acceptance of a
+complete new-topic video or a three-chapter longform film.
 
-## 仍需完成的验收
+## Acceptance work still required
 
-1. 作者检查两套校准片的连续论述、真实动态画面和实际声音，确认后才冻结默认风格版本。
-2. 分别通过 Codex 与 Claude Code 的真实安装，从独立工程完成新题材竖屏视频，并记录
-   数学、叙事、画面、实际听审、风格和技术验收；当前结构检查不能代替 Claude 实装。
-3. 完成至少三章的新题材横屏长片，验证跨章连续性、长片声线、选择性重渲染与中断恢复；
-   短技术样段不能作为这一阶段的验收。
-4. 在没有原工程依赖的 Mac 上进行独立使用者试用，检查依赖准备、字体、升级与卸载，
-   确认作品及必要缓存保留。当前机器复用环境不等于新机器安装成功。
-5. 作者确认项目许可证，完成模型、字体、音乐、浏览器和依赖的授权／分发审查，再进入
-   公开发布。当前私有候选包不能默认为已具备所有分发权利。
+1. The author reviews both calibration videos' continuous reasoning, actual
+   motion, and real audio before freezing the default preset version.
+2. Install through both Codex and Claude Code and complete a new-topic portrait
+   video in independent projects. Record mathematical, narrative, visual,
+   listening, style, and technical acceptance separately. Structure checks do
+   not replace an actual Claude installation.
+3. Complete a new-topic landscape film with at least three chapters. Check
+   continuity, voice consistency over the film, selective rerendering, and
+   interrupted-build recovery. A short technical sample does not meet this gate.
+4. Have an independent user work on a Mac without the original production
+   environment. Verify dependency preparation, fonts, upgrades, and uninstallation,
+   preserving projects and required caches. Reusing environments on the current
+   machine is not evidence of a clean-Mac installation.
+5. Keep third-party licensing and distribution review separate from the project's
+   Apache-2.0 source license. Confirm the applicable terms for any models, fonts,
+   music, browsers, and dependencies before redistributing them or their assets.
 
-高清入口绑定同一身份的低清技术结果和真实画面审查哈希。这个门禁已经实现，但不能
-替作者补签风格、数学或听感认可。安装不会自动下载模型、上传正文、调用收费服务、
-发布作品或清理媒体。分阶段目标见[路线图](plugin_roadmap.md)，具体操作见
-[接口说明](project_interface.md)和[制作流程](production_workflow.md)。
+Final rendering is bound to the same build's passing draft technical result and
+the hash of the visually reviewed draft. This gate is implemented, but cannot
+sign the author's mathematical, style, or listening approval. Installation does
+not automatically download models, upload narration, invoke paid services,
+publish videos, or clean media. See the [roadmap](plugin_roadmap.md),
+[interface](project_interface.md), [production workflow](production_workflow.md),
+and [new-Mac installation guide](installation.md).

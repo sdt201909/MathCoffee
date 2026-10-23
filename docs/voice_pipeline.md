@@ -1,46 +1,57 @@
-# 本地配音与读音验收
+English | [简体中文](voice_pipeline.zh-CN.md)
 
-独立安装后，以 `mathcoffee voice --workspace <用户工程>` 准备请求，显式增加
-`--generate` 才在本地合成。它读取统一 Authoring v1 与项目配置，见
-[创作与配置接口](project_interface.md)。工程也可选择逐句录音导入或显式无声模式。
+# Local voice production and pronunciation review
 
-兼容入口 [synthesize_voice.py](../scripts/synthesize_voice.py) 支持 `kokoro` 与 `qwen_mlx`；
-[create_episode_voiceover.py](../scripts/create_episode_voiceover.py) 保留既有制作调用，
-显式提供 episode、authoring 与 revision。规范实现位于包内，安装者无需复制脚本或
-向插件安装目录写入作品。
+After independent installation, prepare requests with `mathcoffee voice --workspace <user-project>`;
+add `--generate` explicitly to synthesize locally. The command reads unified Authoring v1 and
+project configuration; see the [project interface](project_interface.md). A project may instead
+import per-sentence recordings or explicitly select silent mode.
 
-Manim 的 Python 3.13 环境与配音环境分开。Qwen MLX 使用 Python 3.12、
-MLX-Audio 0.5.7 与固定模型快照；安装与匿名公开权重下载均为显式操作，见
-[运行时说明](../toolchains/speech/README.md)。Kokoro 为可选既有 provider，
-当前未随仓库提供其完整环境锁，不能把它当作已经可一键安装的后端。
+The compatibility entry [synthesize_voice.py](../scripts/synthesize_voice.py) supports `kokoro` and
+`qwen_mlx`. [create_episode_voiceover.py](../scripts/create_episode_voiceover.py) retains existing
+production calls with explicit episode, authoring, and revision arguments. Canonical implementation
+lives inside the package; installed users do not need to copy scripts or write work into the plugin
+installation.
 
-## 正文、配置与模型输入
+The Manim Python 3.13 environment is separate from the voice environment. Qwen MLX uses Python 3.12,
+MLX-Audio 0.5.7, and a pinned model snapshot. Installation and anonymous public-weight downloads are
+explicit operations; see the [runtime guide](../toolchains/speech/README.md). Kokoro is an optional
+existing provider. Its complete environment lock is not currently shipped, so it must not be
+presented as a backend with a ready one-command installation.
 
-原文始终保留，字幕读取原文；词典和数值口述产生独立的归一化输入与命中记录。
-[lexicon.json](../src/mathcoffee/data/speech/lexicon.json) 采用最长上下文优先，不能做全局单字替换。
-图中 A/B/C 必须按同名字母点名，下标、撇号和大小写身份保留。
-[figure_label_contract.py](../src/mathcoffee/figure_label_contract.py) 检查最终模型输入中的
-标签序列；这只能证明文本身份对应，实际发音必须另听样音。
+## Original text, configuration, and model input
 
-[voice_profiles.json](../src/mathcoffee/data/speech/voice_profiles.json) 的默认 `science_female`
-请求 Serena 预置女声，清晰、理性、自然、均匀。profile 是参数配置，不能证明实际
-音色、情绪或自然度。Kokoro 没有同等指令能力；Qwen 的期望读音也不是硬音素约束。
-不克隆真人、不调用收费服务，正式合成使用已核验的本地权重并禁用隐式下载与 token。
-固定模型文件身份由 [model_files.json](../src/mathcoffee/data/speech/model_files.json) 记录，
-生成前核验内容与上游适配源码；`doctor` 的路径检查不等于完整模型哈希检查。
+Preserve original text throughout; subtitles read that original. Dictionaries and spoken-number
+expansion produce separate normalized input and match records.
+[lexicon.json](../src/mathcoffee/data/speech/lexicon.json) selects the longest matching context first;
+it must not perform global single-character substitution. Diagram labels A/B/C retain the same
+letter names, including subscript, prime, and case identity.
+[figure_label_contract.py](../src/mathcoffee/figure_label_contract.py) checks the label sequence in
+the final model input. This proves textual identity correspondence only; actual pronunciation needs
+separate listening.
+
+The default `science_female` request in
+[voice_profiles.json](../src/mathcoffee/data/speech/voice_profiles.json) uses the preset female
+speaker Serena with a clear, rational, natural, even delivery instruction. A profile is a parameter
+configuration, not proof of actual timbre, emotion, or naturalness. Kokoro has no equivalent
+instruction capability; expected Qwen readings are not hard phoneme constraints. Do not clone real
+people or call paid services. Production synthesis uses verified local weights with implicit
+downloads and tokens disabled. [model_files.json](../src/mathcoffee/data/speech/model_files.json)
+records pinned model-file identity. Before generation, verify its contents and the upstream adapter
+source. A `doctor` path check is not a complete model-hash check.
 
 ```sh
-mathcoffee setup --component speech             # 只返回独立 Python 3.12 环境准备计划
-mathcoffee setup --component model              # 只返回固定权重下载计划
-# 已授权准备时，分别增加 --execute；不会随插件安装自动执行。
+mathcoffee setup --component speech             # Plan a separate Python 3.12 voice environment
+mathcoffee setup --component model              # Plan the pinned-weight download
+# Add --execute separately when preparation is authorized; plugin installation does not run it.
 mathcoffee voice --workspace '/absolute/path/to/my video'
 mathcoffee voice --workspace '/absolute/path/to/my video' --generate
 ```
 
-下面是保留的源码工程调用；安装版优先使用上述 CLI。
+The following source-checkout calls remain available. Installed users should prefer the CLI above.
 
 ```sh
-# 仅在需要时安装可选的独立环境；不修改 .venv。
+# Install the optional separate environment only when needed; leave .venv unchanged.
 SPEECH_BASE_PYTHON=/absolute/path/to/python3.12 make speech-setup
 make speech-model
 make speech-doctor
@@ -49,17 +60,24 @@ make speech-doctor
   --provider qwen_mlx --all --dry-run --output-dir media/speech_smoke/new-plan
 ```
 
-准备真实合成前，先用本片多音字、数字、公式、英文混读和图形标签生成短样音。
-新 revision 与新目录保存请求、模型身份、输入 SHA、参数、PCM 与听审状态，不覆盖旧版。
-依赖私有 API 的 [全文本适配](../src/mathcoffee/speech/qwen_context.py) 校验上游版本与源码 SHA，
-不匹配时拒绝运行。`stream: false` 不等于全文本条件；适配后的实际上下文模式进入清单。
+Before full synthesis, generate short representative samples of this film's polyphonic characters,
+numbers, formulas, English mixing, and diagram labels. Save each new revision in a new directory,
+including the request, model identity, input SHA, parameters, PCM, and listening status; do not
+overwrite an older revision. The [full-text adapter](../src/mathcoffee/speech/qwen_context.py), which
+depends on private APIs, verifies the upstream version and source SHA and refuses mismatches.
+`stream: false` does not establish full-text conditioning; the effective context mode after
+adaptation is recorded in the manifest.
 
-## 时间轴与验收
+## Timing and acceptance
 
-从真实 PCM 测活动窗，再派生字幕、镜头锚点和配乐避让。禁止用截尾或任意整段变速
-把旁白挤入估计句窗。跨句声线、语速、停顿和发音分别检查，ASR 或强制对齐不能证明读对。
+Measure activity windows from actual PCM, then derive subtitles, shot anchors, and music ducking.
+Do not trim sentence endings or arbitrarily change whole-passage speed to force narration into
+estimated windows. Review cross-sentence voice character, speed, pauses, and pronunciation
+separately. ASR or forced alignment does not prove correct pronunciation.
 
-通用工具支持显式 seed 补录组合、语速与停顿测量，以及声学代理指标。
-可选 [voice_qa](../toolchains/voice_qa/README.md) 使用本地模型排序疑似声音漂移，
-不能替代人耳判断。未试听就记录待听审，不能把自动成功写成人工认可。
-最终 AAC 音轨另验有效样本、尾部填充与 PCM 同步；源 WAV 正确不代表编码后音轨正确。
+Shared tools support explicit seed-based retake assembly, speech-rate and pause measurements, and
+acoustic proxy metrics. Optional [voice_qa](../toolchains/voice_qa/README.md) uses a local model to
+rank suspected voice drift; it does not replace listening. Record listening as pending if nobody
+has listened. Automated success must not be reported as human approval. Separately verify valid
+samples, tail padding, and PCM synchronization in the final AAC track: a correct source WAV does
+not prove that the encoded track is correct.

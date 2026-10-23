@@ -1,77 +1,97 @@
-# 成片面向观众：论述与显示文字约定
+English | [简体中文](audience_contract.zh-CN.md)
 
-知数咖啡厅的成片回答观众正在追问的数学问题。工程记录服务制作人员，存于计划、
-审校与交付文档；它们不能因为真实、详尽或已通过测试就进入旁白、字幕和画面。
-本约定用于频道内容片。确实以制作技术为主题的作品，应先在本期 brief 明确受众和
-讲解目的，按该目的调整检查规则，不能用自动豁免字段隐藏命中。
+# Audience contract: argument and displayed text
 
-## 从问题推到工具
+A MathCoffee film answers a mathematical question its viewers are asking. Production records serve
+the production team and belong in planning, review, and delivery documents. Their accuracy, detail,
+or passing test status does not make them narration, subtitles, or on-screen content. This contract
+covers the channel's content films. A film whose actual subject is production technology must first
+define its audience and teaching purpose in the episode brief, then adjust the checks to that
+purpose. Do not hide findings behind automatic exemption fields.
 
-审稿要沿实际播放顺序逐段回答：观众正在解决什么，已经得到什么，仍缺哪一步，
-下一工具为什么能解决这个障碍。将答案放在本期制作计划或审稿记录，不能把这四项
-机械念给观众。先呈现可观察的差异、失败或需要，再引入能解释它的定义和推理。
-没有推进主问题的段落应删减或合并；章节数与目标时长都不是保留重复解释的理由。
+## Let the question create the need for a tool
 
-跨章连接要检查“前一段的结果是否真能成为后一段的出发点”，不以“接下来介绍”
-代替因果。代表性连续样段应覆盖一次真正的概念跨越，而非挑选各章最好看的片段。
-记录时间戳、原句、观众尚不知道的条件、修订后的承接及真实动态画面。
-技术测试、数学审校、论述连贯审查、视听抽样、人工试听是不同证据，分别报告；
-任何自动检查 PASS 都不代表观众已经理解。
+Follow actual playback order and answer, passage by passage: what are viewers solving, what have
+they established, what step is missing, and why does the next tool address that obstacle? Record
+the answers in the episode plan or review notes; do not mechanically recite these four questions
+to viewers. Show an observable difference, failure, or need before introducing the definition and
+reasoning that explain it. Remove or combine passages that do not advance the main question.
+Neither chapter count nor target duration justifies repeating an explanation.
 
-## 全片及片尾的受众边界
+For chapter transitions, check whether the preceding result actually supplies the next passage's
+starting point. An announcement such as “next, we introduce…” is not a causal connection. A
+representative continuous sample must cover a real conceptual transition, rather than assemble
+the most attractive clips from each chapter. Record timestamps, original lines, conditions not yet
+known to the viewer, revised connections, and actual dynamic picture. Technical tests,
+mathematical review, argument-continuity review, audiovisual sampling, and human listening are
+separate evidence and must be reported separately. No automated PASS proves audience understanding.
 
-旁白、字幕、标题、图注、数字说明、公式附注、参考卡和封面都是观众文字。
-不能向片中或片尾搬入项目路径、版本号、引擎或配音模型、生成过程、调试、验收、
-复现命令、文件哈希、工程交付或内部制作流程。必要的使用许可署名遵照资产约定；
-学术来源以观众可读的作者、作品名、年份及必要的出处呈现，不能指向“项目说明”
-或“制作记录”来代替参考资料。
+## Audience boundaries throughout the film and ending
 
-片尾从最后一段正文开始检查，一直看到最终黑帧：结论要回扣开场问题，数学边界
-要说明结论适用在哪里，参考资料帮助继续阅读，频道收束自然简洁。不得把内部话语
-从片尾移到正文。修订涉及正文时，更新整段配音、句窗、字幕与显示文案；旧尾声
-不能因复用缓存而回流。保留完整尾音和实际黑帧，不用突然裁音来清除旧句。
+Narration, subtitles, titles, figure captions, numeric explanations, formula annotations, reference
+cards, and covers are all audience text. Do not insert project paths, version numbers, engines or
+voice models, generation processes, debugging, acceptance details, reproduction commands, file
+hashes, engineering handoff, or internal production workflow into the film or ending. Necessary
+license attribution follows the asset rules. Present academic references using viewer-readable
+authors, titles, years, and necessary source details; a link to “project notes” or “production
+records” does not replace a reference.
 
-“生成子空间”“验证等式”“连续版本”“工程中的流体计算”等可以是合法数学内容。
-检查器采用有上下文的规则，避免禁止这些单词本身；其漏报和误报仍需编辑判断。
+Review the ending from the final body passage through the last black frame. The conclusion returns
+to the opening question, mathematical limits explain where the result applies, references enable
+further reading, and the channel closing is natural and concise. Do not move internal language
+from the ending into the body. Changes to body text require updating the whole affected narration
+passage, sentence windows, subtitles, and display text. Cache reuse must not restore an old ending.
+Preserve complete trailing speech and the actual black frame; do not abruptly cut audio to remove
+an old sentence.
 
-## 显式显示文字清单
+Terms such as “generated subspace,” “verify the equality,” “continuous version,” and “fluid
+computation in engineering” may be valid mathematical content. The checker uses contextual rules
+instead of banning the words themselves. Editorial judgment is still required for missed findings
+and false positives.
 
-每期保留一份 `audience_display_manifest.json`，由 renderer 的同一显示文字来源导出。
-不得只扫描 authoring 的旁白，因为辅助函数、动画目标和片尾卡可能另有硬编码文字。
-以下是机器接口，路径和哈希属于内部信息，不显示给观众：
+## Explicit display-text manifest
+
+Each episode retains an `audience_display_manifest.json`, exported from the same text source used
+by the renderer. Scanning only narration in authoring is insufficient: helper functions, animation
+targets, and end cards may contain additional hard-coded text. The following is a machine interface;
+paths and hashes are internal information and are not displayed to viewers:
 
 ```json
 {
   "schema_version": 1,
   "episode": "episode_id",
-  "authoring_sha256": "完整 authoring 文件的 SHA-256",
+  "authoring_sha256": "SHA-256 of the complete authoring file",
   "coverage": {"scene_ids": ["opening", "closing"], "declared_complete": true},
   "entries": [
     {"id": "opening.question", "scene_id": "opening", "kind": "heading",
-     "text": "这张速度图，还缺什么？", "cue_ids": ["opening_01"]},
+     "text": "What is this velocity graph still missing?", "cue_ids": ["opening_01"]},
     {"id": "closing.brand", "scene_id": "closing", "kind": "brand",
-     "text": "知数咖啡厅 · 我们下次见", "cue_ids": ["closing_01"]}
+     "text": "MathCoffee · See you next time", "cue_ids": ["closing_01"]}
   ],
-  "renderer_sources": [{"path": "scenes/episode.py", "sha256": "文件 SHA-256"}],
-  "metadata": {"description": "内部生成与审查记录，不属于显示文字"}
+  "renderer_sources": [{"path": "scenes/episode.py", "sha256": "file SHA-256"}],
+  "metadata": {"description": "Internal generation and review record; not displayed text"}
 }
 ```
 
-条目 ID 唯一；`scene_id` 与可选 `cue_ids` 必须能在 authoring 中定位。
-`kind` 为 `heading`、`label`、`formula`、`reference` 或 `brand`。
-每章至少登记一个真实显示条目；全文只有旁白而没有屏幕文字的特殊章，需调整契约并
-明确说明，不能伪造一条不可见文字凑覆盖。动态文案登记格式化后取值，包括动画目标。
-来源哈希绑定所有实际参与显示文字的 renderer 模块。清单按章覆盖声明不等于证明
-实际帧中没有未登记文字，真实渲染仍须对照显示回执与编码画面。
+Entry IDs are unique; `scene_id` and optional `cue_ids` must resolve in authoring. `kind` is
+`heading`, `label`, `formula`, `reference`, or `brand`. Register at least one genuinely displayed
+entry per chapter. A special chapter containing narration but no on-screen text requires an
+explicit contract adjustment and explanation; do not invent invisible text to satisfy coverage.
+Register dynamic text after formatting, including animation targets. Source hashes bind every
+renderer module participating in display text. Declared chapter coverage does not prove that the
+encoded frames contain no unregistered text. Actual renders must still be compared with display
+receipts and encoded picture.
 
-可用 Manim 正式构造路径的 `dry_run` / `skip_animations` 导出初始显示清单，再在
-正式渲染中记录真实显示条目核对。`Text`、`MathTex`、辅助函数生成的标签、动画
-目标和 `become` 后文字都在范围内。仅按最终帧扫描会漏掉中间文字；数字更新器
-可记录其格式规则与实测取值，但不能用“动态标签”名义跳过中文说明。
+The real Manim construction path may use `dry_run` / `skip_animations` to export an initial display
+manifest, then record actual entries during rendering for comparison. `Text`, `MathTex`, labels
+created by helpers, animation targets, and text after `become` are all in scope. Scanning only the
+last frame misses intermediate text. Numeric updaters may record formatting rules and measured
+values, but “dynamic label” is not an exemption for Chinese explanatory text.
 
-## 检查入口与证据边界
+## Check entry points and evidence limits
 
-先检查正文，随后在时间轴和显示清单都齐备时做完整登记范围检查：
+Check narration first. Once both the timeline and display manifest are available, run the complete
+declared-surface check:
 
 ```sh
 .venv/bin/python scripts/check_audience_text.py \
@@ -85,19 +105,25 @@
   --require-complete --report media/reports/episode/audience/complete.json
 ```
 
-检查器只读取 authoring 标题、章标题、句子正文和公式；显示清单的 `entries[].text`；
-timeline 的逐句 `caption` 和正文一致性。内部 `scope`、`review`、`question`、
-`result`、文件路径和其他 metadata 不递归扫描。若这些内部字段实际显示，必须作为
-显示条目登记。字幕允许换行／空白差异，不允许静默删句、重排或换成旧稿。
+The checker reads only authoring titles, chapter titles, sentence text, and formulas; display
+manifest `entries[].text`; and timeline sentence `caption` values and their consistency with the
+body. It does not recursively scan internal `scope`, `review`, `question`, `result`, file paths,
+or other metadata. If an internal field is actually displayed, register it as a display entry.
+Subtitles may differ in whitespace or line breaks, but must not silently omit or reorder sentences
+or substitute an older script.
 
-返回 `BLOCKED` 表示规则命中、来源过期、结构或字幕不一致；`SCOPED_TEXT_PASS`
-仅表示现有输入范围无命中；`DECLARED_SURFACES_TEXT_PASS` 表示完整登记范围检查
-通过。最后一种状态仍不意味着理解、发音或所有画面文字都通过。`--require-complete`
-拒绝缺显示清单或时间轴的有限检查。退出码为 0（检查通过）、1（检查阻断）、2（输入
-无法读取／解析）。代表性整章样段显式加 `--allow-scene-subset`，逐句必须完整，
-顺序遵从 authoring；正式全片不使用该选项。报告记录实际选择的章节。
+`BLOCKED` means a rule matched, a source is stale, or structure/subtitles are inconsistent.
+`SCOPED_TEXT_PASS` means only that the supplied input scope has no findings.
+`DECLARED_SURFACES_TEXT_PASS` means the complete declared-surface check passed. Even this last status
+does not establish understanding, pronunciation accuracy, or acceptance of all picture text.
+`--require-complete` rejects a limited check missing a display manifest or timeline. Exit codes are
+0 for a passed check, 1 for a blocked check, and 2 for unreadable/unparseable input. For a
+representative sample of complete chapters, explicitly use `--allow-scene-subset`; sentences must
+remain complete and follow authoring order. Do not use that option for the full production film.
+The report records the chapters actually selected.
 
-渲染器可导入 `check_text(text, location=..., channel=...)` 对真实文字即时检查，
-或调用 `check_audience(authoring, display_manifest=..., timeline=...,
-authoring_sha256=..., root=..., allow_scene_subset=False)`。最终打包前重新核对清单
-与时间轴输入哈希，并单独保存论述审查和从正文到黑帧的画面／音频审查结果。
+Renderers may import `check_text(text, location=..., channel=...)` to check real text at the point of
+use, or call `check_audience(authoring, display_manifest=..., timeline=...,
+authoring_sha256=..., root=..., allow_scene_subset=False)`. Before final packaging, recheck input
+hashes for the manifest and timeline. Preserve argument review and the picture/audio review from
+the final body passage to black as separate records.

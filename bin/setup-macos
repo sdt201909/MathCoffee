@@ -1,0 +1,97 @@
+#!/bin/sh
+# Read-only by default. No shell-profile edits, remote shell scripts, or password handling.
+set -eu
+bootstrap_bin=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+bootstrap_execute=false
+bootstrap_profile=core
+bootstrap_with_tex=false
+bootstrap_with_model=false
+bootstrap_wheel=
+
+usage() {
+  printf '%s\n' 'Usage: bin/setup-macos [--profile core|render|full] [--with-tex] [--with-model] [--wheel /absolute/path/file.whl] [--execute]'
+  printf '%s\n' 'Default: display a read-only plan. --with-model requires full; --with-tex requires render/full.'
+}
+validate_arguments() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --help|-h) usage; exit 0 ;;
+      --execute) bootstrap_execute=true ;;
+      --with-tex) bootstrap_with_tex=true ;;
+      --with-model) bootstrap_with_model=true ;;
+      --profile)
+        [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+        bootstrap_profile=$2; shift ;;
+      --profile=*) bootstrap_profile=${1#--profile=} ;;
+      --wheel)
+        [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+        bootstrap_wheel=$2; shift ;;
+      --wheel=*) bootstrap_wheel=${1#--wheel=} ;;
+      *) usage >&2; printf '%s\n' 'Unknown bootstrap argument.' >&2; exit 2 ;;
+    esac
+    shift
+  done
+  case "$bootstrap_profile" in core|render|full) ;; *) usage >&2; exit 2 ;; esac
+  if [ "$bootstrap_with_model" = true ] && [ "$bootstrap_profile" != full ]; then
+    printf '%s\n' '--with-model requires --profile full.' >&2; exit 2
+  fi
+  if [ "$bootstrap_with_tex" = true ] && [ "$bootstrap_profile" = core ]; then
+    printf '%s\n' '--with-tex requires --profile render or full.' >&2; exit 2
+  fi
+}
+validate_arguments "$@"
+bootstrap_python=
+for bootstrap_candidate in /opt/homebrew/opt/python@3.13/bin/python3.13 "$(command -v python3 || true)"; do
+  # Apple's system Python can be a CLT-installation stub on a blank Mac.
+  # Inspect that prerequisite before executing the stub, including for dry runs.
+  if [ "$bootstrap_candidate" = /usr/bin/python3 ] && [ "$(uname -s)" = Darwin ] && ! xcode-select -p >/dev/null 2>&1; then
+    continue
+  fi
+  if [ -n "$bootstrap_candidate" ] && [ -x "$bootstrap_candidate" ] && "$bootstrap_candidate" -I -B -c 'import sys; sys.exit(0 if sys.version_info >= (3,9) else 1)' 2>/dev/null; then
+    bootstrap_python=$bootstrap_candidate; break
+  fi
+done
+if [ -n "$bootstrap_python" ]; then
+  exec "$bootstrap_python" -I -B "$bootstrap_bin/bootstrap.py" "$@"
+fi
+# A truly blank machine may have no usable Python. These fixed, validated values
+# are the only interpolation in the fallback JSON; paths are never interpolated.
+if [ "$bootstrap_execute" = false ]; then
+  printf '{"status":"bootstrap_frontend_plan","profile":"%s","executed":false,"with_tex":%s,"with_model":%s,"next_step":"A Python >=3.9 is needed to inspect the full plan. Explicit execution first checks native Apple Silicon Homebrew and Command Line Tools, then installs only missing uv and python@3.13. No Xcode or Homebrew installation is automatic."}\n' "$bootstrap_profile" "$bootstrap_with_tex" "$bootstrap_with_model"
+  exit 0
+fi
+if [ "$(uname -s)" != Darwin ] || [ "$(uname -m)" != arm64 ]; then
+  printf '%s\n' 'Execution requires native Apple Silicon macOS; planning is available on other hosts.' >&2; exit 2
+fi
+bootstrap_brew=$(command -v brew || true)
+if [ -z "$bootstrap_brew" ] && [ -x /opt/homebrew/bin/brew ]; then
+  bootstrap_brew=/opt/homebrew/bin/brew
+fi
+if [ -z "$bootstrap_brew" ] || [ "$("$bootstrap_brew" --prefix)" != /opt/homebrew ]; then
+  printf '%s\n' 'Install native Homebrew yourself using the reviewed instructions at https://brew.sh/; rerun afterwards.' >&2; exit 2
+fi
+if ! xcode-select -p >/dev/null 2>&1; then
+  printf '%s\n' 'Run xcode-select --install and complete Apple’s dialog first: https://developer.apple.com/xcode/resources/' >&2; exit 2
+fi
+if [ -z "$bootstrap_wheel" ]; then
+  set -- "$bootstrap_bin"/../wheels/*.whl
+  if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+    printf '%s\n' 'Use a complete release ZIP, or build a wheel and pass --wheel /absolute/path/file.whl. No source files were modified.' >&2; exit 2
+  fi
+else
+  if [ ! -f "$bootstrap_wheel" ] || [ -L "$bootstrap_wheel" ]; then
+    printf '%s\n' '--wheel must be an existing regular local wheel.' >&2; exit 2
+  fi
+fi
+export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+for bootstrap_formula in uv python@3.13; do
+  if ! "$bootstrap_brew" list --formula --versions "$bootstrap_formula" >/dev/null 2>&1; then
+    "$bootstrap_brew" install --formula "$bootstrap_formula"
+  fi
+done
+# Arguments are reconstructed from validated options; no eval or shell quoting round-trip.
+set -- --profile "$bootstrap_profile" --execute
+[ "$bootstrap_with_tex" = false ] || set -- "$@" --with-tex
+[ "$bootstrap_with_model" = false ] || set -- "$@" --with-model
+[ -z "$bootstrap_wheel" ] || set -- "$@" --wheel "$bootstrap_wheel"
+exec /opt/homebrew/opt/python@3.13/bin/python3.13 -I -B "$bootstrap_bin/bootstrap.py" "$@"

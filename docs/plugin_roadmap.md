@@ -1,21 +1,45 @@
-# Plugin 分阶段改造与后续门槛
+# Plugin roadmap and acceptance gates
 
-实施基线为0.2.0a1候选版；阶段进度分“代码已实现”“自动验证”“真实媒体检查”与
-“人工确认”，不以版本号替代验收。首版范围为 Codex＋Claude Code、Apple Silicon Mac，
-先竖屏、后横屏；对话和配置文件控制风格，首版不提供可视化编辑器。
+English | [简体中文](plugin_roadmap.zh-CN.md)
 
-1. **风格基准**：已有两套候选预设、独立品牌配置及校准规范。作者看片／听音确认待完成，
-   不冻结为已认可风格，不继承历史单集的人工认可。
-2. **独立安装与数据底座**：CLI、包资源、工作区与Authoring v1编译已实现。安装产物在
-   无渲染依赖且源码目录之外验证；具体结果见实施状态。
-3. **可配置组件**：Manim数学组件与Remotion共用颜色、字体、布局、时窗与字幕策略，
-   记录显示清单、真实边界及动作锚点；任意新主题仍需要模型和独立数学审稿。
-4. **竖屏Alpha**：已连接声音／导入PCM、实际句窗、场景、混音、低清、恢复与技术验收；
-   宿主包分别生成。完整风格／实际听审和Claude真实加载不能由组件测试代签。
-5. **横屏Beta**：同一内核支持多章、字幕、公式、选择性重建和最终门禁。代表性样段与
-   长片尺度验证分开记录，短样片不等于已完成长片交付验收。
-6. **外部试用与公开发布**：仍需独立使用者在无原工程依赖的Mac完成制作，验证升级卸载、
-   字体与配音能力。项目开源许可证与第三方依赖分发边界由作者确认后，才进入公开发布。
+The framework began with the `0.2.0a1` implementation candidate; the community
+source release is `v0.2.0-alpha.2` (Python `0.2.0a2`) under
+[Apache-2.0](../LICENSE). Track implemented code, automated validation, real-media
+inspection, and human approval separately. A version number is not acceptance
+evidence. Initial support targets Codex and Claude Code on Apple Silicon Mac,
+with portrait videos before landscape longform. Conversation and editable
+configuration control style; the first version has no visual configuration editor.
 
-作品、单期完整代码和媒体留在用户本地工程；仓库只保留通用组件、模板与生成型测试。
-不自动下载模型、调用收费服务、上传正文、发布作品或清理用户媒体。
+1. **Style baseline.** Two candidate presets, separate branding, and calibration
+   criteria are implemented. The author's visual/listening approval is still
+   pending. Do not freeze an approved style or inherit approval from historical
+   episodes.
+2. **Independent installation and authoring.** The CLI, package resources,
+   workspaces, and Authoring v1 compiler are implemented. Installation artifacts
+   have been checked outside the source tree without rendering dependencies;
+   consult the [implementation status](implementation_status.md) for exact scope
+   and artifact versions.
+3. **Configurable components.** Manim mathematical components and Remotion share
+   colors, fonts, layout, timing windows, and caption policy, with display
+   manifests, measured bounds, and action anchors. A new topic still needs its
+   own model and independent mathematical review.
+4. **Portrait alpha.** Voice synthesis/imported PCM, measured sentence windows,
+   scenes, mixing, drafts, recovery, and technical verification are connected,
+   with separate host packages. Component tests cannot approve style, actual
+   audible quality, or real Claude host loading.
+5. **Landscape beta.** The same core supports multiple chapters, captions,
+   formulas, selective rebuilds, and the final-render gate. Representative
+   samples and full-film-scale verification are separate; a short clip is not
+   acceptance of a longform delivery.
+6. **Community maintenance and external trials.** Publish the framework source
+   under its project license and invite contributions. Independent users must
+   still complete production on Macs without the original project environment,
+   checking upgrades/uninstallation, fonts, and voice capability. Third-party
+   distribution terms remain separate from the source license and from technical
+   acceptance. See [contributing](../CONTRIBUTING.md) and
+   [installation](installation.md).
+
+User work, complete episode code, and media stay in local user projects. The
+repository contains only generic components, templates, and generated test
+fixtures. Installing the plugin does not automatically download models, invoke
+paid services, upload narration, publish videos, or clean user media.

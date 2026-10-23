@@ -1,76 +1,109 @@
-# MathCoffee：Agent 工作约定
+English | [简体中文](AGENTS.zh-CN.md)
 
-这是知数咖啡厅的视频制作工程。先读 [文档入口](docs/README.md) 和
-[制作流程](docs/production_workflow.md)，再读本期的制作计划、数学说明、旁白与交付记录。
-具体安装和已有命令见根 [README](README.md)；不要用历史单集文档替代全局规范。
+# MathCoffee: working agreements for agents
 
-## 开始任务
+This is the MathCoffee video production framework. Read the [documentation index](docs/README.md)
+and [production workflow](docs/production_workflow.md) first, then the current episode's production
+plan, mathematical notes, narration and delivery records. Installation and available commands are
+in the root [README](README.md). Historical episode documents do not replace global requirements.
 
-- 先检查 `git status --short`、相关脚本与输出目录。大量单集文件可能尚未纳入 Git；
-  未跟踪不等于可丢弃。保留用户已有更改，不重置、覆盖或顺手整理无关集数。
-- 将用户目标落实为本期 brief：观众、要回答的问题、数学边界、叙事要求、交付规格、
-  允许的外部服务及已授权范围。缺少非关键偏好时作明确假设并继续独立工作。
-- 已授权的制作、安装或清理不重复求确认；新增费用、账号、持久凭据、外部文本传输或
-  显式法律接受需先报告。不得读取秘密、调用收费 API、克隆真人声音或自行发布。
-  提交、推送和覆盖已发布母版也须在本次授权范围内。
-- 多 Agent 按文件或模块划定唯一写入者。可并行独立审稿与媒体检查，避免同时修改
-  同一源文件；渲染期间冻结其依赖，变化后重新判断哪些片段失效。
+## Starting a task
 
-## 环境与引擎
+- Check `git status --short`, the relevant scripts and output directories first. A local production
+  workspace may contain many untracked episode files; untracked does not mean disposable. Preserve
+  existing user changes. Do not reset, overwrite or reorganize unrelated episodes.
+- Turn the user's objective into an episode brief: audience, question, mathematical scope, narrative
+  requirements, delivery specifications, permitted external services and authorized actions. State
+  reasonable assumptions for noncritical missing preferences and continue independent work.
+- Do not ask again for production, installation or cleanup already authorized. Report new costs,
+  accounts, persistent credentials, external text transfers or explicit legal acceptance first.
+  Never read secrets, call paid APIs, clone real people's voices or publish autonomously. Commits,
+  pushes and replacement of published masters must also be within the current authorization.
+- Give each file or module a single writing agent. Independent reviews and media checks may run
+  concurrently. Avoid simultaneous edits to a source file; freeze dependencies during rendering
+  and reassess invalidated clips after any change.
 
-- `.venv` 是现有 Python 3.13 / Manim 环境，依赖由 `uv.lock` 管理；
-  `.venv-kokoro` 是独立 Python 3.12 / Kokoro 配音环境。不要混装或为运行单集
-  擅自升级历史依赖。新配音后端采用独立环境与可替换 provider。
-- 裸 `make` 的默认目标是 `help`，不会安装或渲染。检查或日常制作必须指定目标，
-  已有环境优先使用已核对的解释器和单集入口，不能把渲染当成无成本检查。
-- Manim 负责可计算的数学状态、严谨几何和连续变换；Remotion 负责叙事排版、镜头
-  编排、信息展示及片段组合。两者共用创作数据与时间轴，不维护两套事实或字幕正文。
-- renderer 输入输出、锁定版本和实际可用 CLI 以
-  [双引擎接口](docs/engine_integration.md)为准。直接运行 Manim 要显式指定项目配置；
-  单集脚本已有隔离配置时沿用它，不借新引擎重做已发布作品。
+## Environments and engines
 
-## 内容、声音与资产
+- A local production checkout may have an existing Python 3.13 / Manim `.venv` managed by `uv.lock`
+  and a separate Python 3.12 / Kokoro `.venv-kokoro`. The Qwen speech runtime also uses an independent
+  Python 3.12 environment. Installed plugins keep their runtimes outside the installation directory.
+  Do not mix environments or upgrade historical dependencies just to run an episode. New speech
+  backends need their own environment and a replaceable provider.
+- Bare `make` defaults to `help`; it does not install or render. Specify a target for inspection or
+  daily production. Prefer verified existing interpreters and episode entry points. Rendering is
+  not a free diagnostic check.
+- Manim handles computable mathematical state, rigorous geometry and continuous transformations.
+  Remotion handles narrative layout, shot arrangement, information display and clip composition.
+  Both share authoring data and a timeline; do not maintain separate facts or subtitle text.
+- Renderer inputs, outputs, pinned versions and available CLI commands are defined by the
+  [dual-engine contract](docs/engine_integration.md). Direct Manim invocations must explicitly select
+  the project configuration. Reuse an episode's isolated configuration where present. Do not use a
+  new engine as a reason to remake published work.
 
-- 每期一个 authoring 来源，稳定的场景／句子／事件 ID；旁白、字幕和场景计划由它
-  派生。实际配音决定句窗，数学图、道具、回放读取同一状态或事件记录。
-- 数学表达标明假设、近似与反例边界。模型数值、几何和公式来自共同计算；叙事
-  回放不得临时新增关键动作。独立审校需检查推导及因果，不只校对措辞。
-- 成片面向频道观众。论述按“问题、已有结果、仍存障碍、下一工具的必要性”审查，
-  不以技术测试通过代替观众理解。旁白、字幕及显示文案不得混入项目、版本、引擎、
-  生成、调试、验收、路径、复现或内部制作流程；这些信息保留在工程文档。
-  片尾只留内容结论、开场回扣、观众可读学术参考与自然频道收束，不能把内部话语
-  挪到正文。显式显示文字清单、自动检查与实际试听的边界见[受众约定](docs/audience_contract.md)。
-- 发音修正保留原文、归一化文本、词典版本、命中上下文和模型输入记录。
-  图形点名必须与画面标记同名：A/B/C 读英文字母，不得改称甲乙丙；下标、撇号与
-  大小写身份按实际标签保留。字幕保留图中字形，TTS 可审计地展开为“A 下标一”等，
-  合成前验证标签序列，合成后另作实际读音审查，不能仅凭输入或强制对齐宣称读对。
-  温柔、慵懒或情绪能力必须通过真实样音评估，不能用降语速宣称音色升级；
-  多音字与同声中英混读分别实测。未试听须明确记录，见[配音管线](docs/voice_pipeline.md)。
-- 资产记录作者／来源、许可证与用途、版本／哈希；未知许可不能假定可用。
-  配乐按主题、情绪、段落和节奏确定性选择，保留选曲依据并让位于旁白；
-  没有适合且有权使用的曲目时可以静音，不伪称已具备丰富曲库。
+## Content, voices and assets
 
-## 验收与交付
+- Use one authoring source per episode, with stable scene, sentence and event IDs. Derive narration,
+  captions and scene plans from it. Actual speech determines sentence windows; mathematical visuals,
+  props and replays read the same state or event records.
+- State assumptions, approximations and counterexample boundaries. Model values, geometry and
+  formulas must come from shared calculations. Narrative replays must not introduce new key
+  actions. Independent review checks derivations and causality, not just wording.
+- Finished videos address channel viewers. Review the argument as “question, established result,
+  remaining obstacle, why the next tool is needed.” Technical tests do not establish audience
+  understanding. Narration, captions and visible copy must not contain project, version, engine,
+  generation, debugging, acceptance, path, reproduction or internal workflow details; keep those
+  in engineering documents. Endings contain only the conclusion, a return to the opening question,
+  viewer-readable academic references and a natural channel sign-off. Do not move internal copy
+  into the main content instead. See the [audience contract](docs/audience_contract.md) for declared
+  display text, automated checks and the limits of listening evidence.
+- Pronunciation corrections retain the original text, normalized text, dictionary version, matched
+  context and model input. Spoken diagram names must match visible labels: A/B/C are English
+  letters, never substitutes such as 甲/乙/丙. Preserve subscripts, primes and letter case. Captions
+  retain the diagram glyphs; TTS may audibly expand a label, such as “A subscript one,” with an
+  auditable record. Validate label order before synthesis and review actual pronunciation afterward;
+  input text or forced alignment alone does not prove correct pronunciation. Evaluate gentle,
+  relaxed or emotional delivery with real samples. Slowing speech does not establish a better
+  voice. Test Chinese polyphonic characters and same-voice Chinese/English mixing separately.
+  Explicitly record when listening has not occurred; see the [voice pipeline](docs/voice_pipeline.md).
+- Record asset authors or sources, licenses, intended uses and versions or hashes. Unknown licensing
+  does not imply permission. Select music deterministically from theme, mood, section and rhythm,
+  retain the selection rationale and yield to narration. Silence is valid when no suitable licensed
+  track exists; do not claim a rich catalog that is not available.
 
-- 先完成低清全片审查，再做高清正式渲染。检查真实编码画面的中间动作、遮挡、
-  文字和字幕安全区、箭头端点、数学状态与声画锚点，不能只看首尾截图。
-- 正文与显示文案修改后，先审代表性跨章连续样段的推理承接，再审全片；最后一段
-  正文到黑帧要逐句逐画面核对受众边界，并确认旧尾声未从配音／字幕缓存回流。
-  自动文本检查、技术验收、论述连贯审查和实际听审分别记录，不相互替代。
-- 对最终容器核验实际尺寸、帧率、帧数／时间戳、音轨、时长、字幕边界和音频同步；
-  同时保存源与输出哈希、命令、依赖版本及测试结果。源 WAV 正确不等于编码后音轨正确。
-- 测试覆盖实际变更和兼容边界；有效检查通过后不无故重复全库渲染。
-  区分自动验证、目视抽样、人工试听与未跑项，不将抽样说成逐秒人工看完。
-- 交付报告写清成品绝对路径、规格、大小、哈希与限制。只有工具确认保存成功才能
-  报 Library ID；本机路径、Library 保存、聊天附件发送和平台发布是不同结果。
+## Acceptance and delivery
 
-## 可恢复清理
+- Review a complete low-resolution video before a final high-resolution render. Inspect actual
+  encoded intermediate action, occlusion, text and subtitle safe areas, arrow endpoints,
+  mathematical state and audiovisual anchors. First and last screenshots are insufficient.
+- After narration or visible-copy revisions, first review representative continuous passages across
+  chapter boundaries, then the whole video. Check every sentence and visual from the last main
+  passage to black against the audience contract, and ensure old endings have not returned through
+  voice or caption caches. Record automated text checks, technical acceptance, argument continuity
+  review and actual listening separately; none substitutes for another.
+- Verify the final container's actual dimensions, frame rate, frame count or timestamps, audio
+  tracks, duration, subtitle bounds and audio synchronization. Save source and output hashes,
+  commands, dependency versions and test results. A correct source WAV does not prove that the
+  encoded audio track is correct.
+- Test the actual changes and compatibility boundaries. Do not repeat full-library rendering after
+  effective checks pass without a reason. Distinguish automated verification, visual sampling,
+  human listening and unrun checks. Do not describe sampling as a second-by-second human review.
+- Delivery reports include absolute output paths, specifications, sizes, hashes and limitations.
+  Report a Library ID only after a tool confirms a successful save. A local path, Library save,
+  chat attachment and platform publication are different outcomes.
 
-- `media/` 被 Git 忽略，但包含正式成片、配音、时间轴和验收依据，绝不能整体清空。
-- 只在用户授权的集数和文件范围内清理可再生成中间件。先列明原路径、大小、哈希、
-  依赖与保留清单，再用系统废纸篓的受支持接口处理，并记录实际恢复位置。
-- 保留发布母版、最终封面、已交付样片、源码、authoring、字幕、必要资产／配音、
-  清单与验证记录；高清分章源是否保留按本期复现方案决定。不要清理其他集数或共享必要缓存。
-- 废纸篓不可用或权限不足就停止相关移动并报告；不得改用 `rm` 永久删除、清空
-  废纸篓或删除 Library 副本。移动后复核保留文件，说明恢复步骤和冲突处理。
-  移入废纸篓不等于立即释放磁盘空间。
+## Recoverable cleanup
+
+- `media/` is ignored by Git but contains final videos, voices, timelines and acceptance evidence.
+  Never clear the entire directory.
+- Clean regenerable intermediates only within the user-authorized episodes and files. First list
+  original paths, sizes, hashes, dependencies and retention decisions; then use a supported system
+  Trash interface and record the actual recovery location.
+- Retain published masters, final covers, delivered previews, source, authoring, captions, necessary
+  assets or voices, manifests and validation records. Retain high-resolution chapter sources as
+  required by the episode's reproduction plan. Do not clean unrelated episodes or necessary shared
+  caches.
+- If Trash is unavailable or permissions are insufficient, stop the affected moves and report the
+  issue. Do not fall back to permanent deletion with `rm`, empty Trash or delete Library copies.
+  Recheck retained files after moving, explain recovery steps and conflict handling, and do not
+  imply that moving to Trash immediately frees disk space.

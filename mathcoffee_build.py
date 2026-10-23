@@ -13,7 +13,7 @@ IGNORED = shutil.ignore_patterns("__pycache__", "*.pyc", "node_modules", ".npm-c
 
 def _copy_reviewed(source: Path, target: Path, prefix: str, reviewed: set[str]) -> None:
     for name in sorted(reviewed):
-        if name != prefix and not name.startswith(prefix + "/"):
+        if prefix and name != prefix and not name.startswith(prefix + "/"):
             continue
         original = source / name
         if not original.is_file() or any(p.is_symlink() for p in (original, *original.parents) if p != source and source in p.parents):
@@ -34,23 +34,23 @@ def assembled():
             raise ValueError("invalid reviewed distribution path")
     with tempfile.TemporaryDirectory(prefix="mathcoffee-build-") as temporary:
         target = Path(temporary)
-        for name in ("pyproject.toml", "README.md", "mathcoffee_build.py", "uv.lock", "repository-files.txt"):
-            if (source / name).is_file():
-                shutil.copy2(source / name, target / name)
-        _copy_reviewed(source, target, "src", reviewed)
+        _copy_reviewed(source, target, "", reviewed)
         data = target / "src/mathcoffee/data"
         distribution = data / "distribution"
         distribution.mkdir(parents=True, exist_ok=True)
-        for name in ("skills", "bin", ".claude-plugin", ".agents"):
+        for name in ("skills", "bin", "docs", ".claude-plugin", ".agents"):
             if (source / name).is_dir():
-                _copy_reviewed(source, target, name, reviewed)
                 shutil.copytree(target / name, distribution / name, dirs_exist_ok=True, ignore=IGNORED)
+        for name in ("LICENSE", "NOTICE", "README.md", "README.zh-CN.md", "AGENTS.md", "AGENTS.zh-CN.md",
+                     "CONTRIBUTING.md", "CONTRIBUTING.zh-CN.md", "SECURITY.md", "SECURITY.zh-CN.md",
+                     "THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.zh-CN.md", "Brewfile"):
+            if (target / name).is_file():
+                shutil.copy2(target / name, distribution / name)
         if (source / "plugin.json").is_file():
             shutil.copy2(source / "plugin.json", target / "plugin.json")
             shutil.copy2(source / "plugin.json", distribution / "plugin.json")
         for name in ("engines/remotion", "toolchains"):
             if (source / name).is_dir():
-                _copy_reviewed(source, target, name, reviewed)
                 shutil.copytree(target / name, data / name, dirs_exist_ok=True, ignore=IGNORED)
         previous = Path.cwd()
         try:

@@ -1,13 +1,29 @@
-# 本地 MLX / Qwen 配音运行时
+English | [简体中文](README.zh-CN.md)
 
-此可选工具链使用独立 Python 3.12 环境，锁文件针对 macOS arm64。它不改变主 Manim 环境。
-模型采用固定的 Qwen CustomVoice 官方快照，推理由独立项目 MLX-Audio 提供。
-仓库只包含下载器、配置和许可证，不包含模型权重或生成音频。
+# Local MLX / Qwen speech runtime
 
-## 安装和检查
+This optional toolchain uses an independent Python 3.12 environment, with a lockfile for macOS
+arm64. It does not change the main Manim environment. The model is a pinned official Qwen CustomVoice
+snapshot; inference is provided by the independent MLX-Audio project. The repository includes
+downloaders, configuration and notices, not model weights or generated audio.
 
-先确认已有 Python 3.12 和 uv；下面命令会联网安装依赖及下载约 4.52 GB 的公开模型，
-仅在用户授权后运行。可用 `SPEECH_BASE_PYTHON` 指定现有 Python 3.12 解释器。
+## Installation and inspection
+
+For installed plugins, use the [installation guide](../../docs/installation.md) and the CLI's
+external runtime directories:
+
+```sh
+mathcoffee setup --component speech
+mathcoffee setup --component model
+```
+
+These commands show plans. Add `--execute` only for authorized preparation. Model download is a
+separate explicit action; planning does not require weights.
+
+The following source-development commands require existing Python 3.12 and uv. Together they
+install dependencies over the network and download about 4.52 GB of public model data, so run them
+only within the user's authorized scope. `SPEECH_BASE_PYTHON` can select an existing Python 3.12
+interpreter.
 
 ```sh
 sh toolchains/speech/setup.sh
@@ -16,27 +32,32 @@ sh toolchains/speech/setup.sh
 .venv-speech/bin/python toolchains/speech/smoke.py
 ```
 
-`setup.sh` 用 `uv pip sync --require-hashes` 安装锁定包；下载器仅访问公开固定文件，
-显式禁止 Hugging Face 隐式 token。`model_files.json` 保存模型 revision、文件大小
-与校验值。完整文件通过校验后才记入完成清单；中断下载保留临时文件。
-`doctor.py` 和 `smoke.py` 离线运行，报告写入 `media/reports/agent_upgrade/speech_runtime/`。
-后者会加载模型并生成一条短句，需要 Apple Silicon Metal 和相应内存。
+`setup.sh` installs locked packages with `uv pip sync --require-hashes`. The downloader fetches
+pinned public files and explicitly disables implicit Hugging Face tokens. The
+[model manifest](../../src/mathcoffee/data/speech/model_files.json) records the revision, file sizes
+and checksums. Files enter the completion receipt only after full validation; interrupted downloads
+retain partial files. `doctor.py` and `smoke.py` run offline. Source-toolchain reports live under
+`media/reports/agent_upgrade/speech_runtime/`. The smoke test loads the model and synthesizes a
+short sentence; it needs Apple Silicon Metal and sufficient memory.
 
-## 固定来源与许可证
+## Pinned provenance and notices
 
-- MLX-Audio 0.5.7：[PyPI](https://pypi.org/project/mlx-audio/0.5.7/)、
-  [上游项目](https://github.com/Blaizzy/mlx-audio)，许可证文本见 `LICENSE-mlx-audio.txt`。
-- Qwen CustomVoice：[固定模型快照](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/tree/0c0e3051f131929182e2c023b9537f8b1c68adfe)。
-  revision 为 `0c0e3051f131929182e2c023b9537f8b1c68adfe`；来源和许可证哈希见
-  `licenses.json`，文本见 `LICENSE-Qwen3-TTS.txt`。
+- MLX-Audio 0.5.7: [PyPI](https://pypi.org/project/mlx-audio/0.5.7/) and
+  [upstream project](https://github.com/Blaizzy/mlx-audio). The preserved notice is
+  [LICENSE-mlx-audio.txt](LICENSE-mlx-audio.txt).
+- Qwen CustomVoice: [pinned model snapshot](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/tree/0c0e3051f131929182e2c023b9537f8b1c68adfe),
+  revision `0c0e3051f131929182e2c023b9537f8b1c68adfe`. Source and license hashes are recorded in
+  [licenses.json](licenses.json); the preserved text is [LICENSE-Qwen3-TTS.txt](LICENSE-Qwen3-TTS.txt).
 
-锁定来源不等于所有平台均验证通过。下载模型后仍应保存其来源与许可材料。
-工具采用预置说话人，不提供真人声音克隆或云端回退。
+Pinned provenance does not establish compatibility with every platform. Retain model source and
+license material after downloading. The tool uses preset speakers; it offers neither cloning of
+real voices nor a cloud fallback.
 
-## 验收边界
+## Acceptance limits
 
-provider 会记录原文、归一化文字、发音词典命中、模型来源、运行时适配与输出哈希。
-Qwen 接收文字及风格指令；Kokoro 的音素替换不能作为 Qwen 的硬发音控制。
-`smoke.py` 的有限值、非静音和波形检查不证明读音、音色、情绪或完整性合格。
-实际试听与编码后声画同步检查应另行记录。使用接口见
-[配音管线](../../docs/voice_pipeline.md)。
+The provider records original text, normalized input, pronunciation-dictionary matches, model
+provenance, runtime adaptations and output hashes. Qwen accepts text and style instructions;
+Kokoro phoneme replacements are not hard pronunciation controls for Qwen. Finite-value, non-silence
+and waveform checks in `smoke.py` do not establish correct pronunciation, voice quality, emotion or
+completeness. Record actual listening and synchronization of the final encoded audio separately.
+See the [voice pipeline](../../docs/voice_pipeline.md) for production interfaces.

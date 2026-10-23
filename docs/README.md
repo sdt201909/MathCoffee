@@ -1,25 +1,35 @@
-# 框架文档入口
+# Framework documentation
 
-此仓库保留 MathCoffee 的通用制作能力，不包含频道单期的场景、正文、媒体或交付记录。
+English | [简体中文](README.zh-CN.md)
 
-| 文档 | 用途 |
+This repository contains MathCoffee's reusable production framework. It does not
+include the channel's episode scenes, scripts, media, or delivery records.
+
+| Document | Purpose |
 |---|---|
-| [Agent 约定](../AGENTS.md) | 工作区保护、独立环境、审查与可恢复清理 |
-| [制作流程](production_workflow.md) | 从 brief 到可核验交付 |
-| [创作与配置接口](project_interface.md) | 用户工作区、Authoring v1、CLI 与构建恢复 |
-| [候选风格基线](style_baseline.md) | 横竖屏预设、语义颜色、节奏与确认边界 |
-| [受众约定](audience_contract.md) | 问题链、显示文案与片尾边界 |
-| [双引擎接口](engine_integration.md) | 同一时间轴、素材契约与渲染入口 |
-| [配音管线](voice_pipeline.md) | 本地 provider、词典、真实句窗与试听边界 |
-| [依赖与授权边界](dependencies.md) | 运行时锁、第三方声明与待审项目 |
-| [实施与验收状态](implementation_status.md) | 已实现内容、验证范围与仍待完成的门槛 |
-| [Plugin 路线图](plugin_roadmap.md) | 分阶段目标和发布前要求 |
-| [仓库边界](repository_scope.md) | 文件白名单、历史隔离与后续提交方式 |
+| [Installation on a new Mac](installation.md) | System prerequisites, isolated runtimes, and first use |
+| [Agent conventions](../AGENTS.md) | Workspace protection, isolated environments, review, and recoverable cleanup |
+| [Production workflow](production_workflow.md) | From a brief to verifiable delivery |
+| [Authoring and configuration interface](project_interface.md) | User workspaces, Authoring v1, CLI, and build recovery |
+| [Candidate style baseline](style_baseline.md) | Portrait and landscape presets, semantic colors, pacing, and approval boundaries |
+| [Audience contract](audience_contract.md) | The question chain, displayed text, and ending boundaries |
+| [Dual-engine interface](engine_integration.md) | A shared timeline, media contracts, and renderer entry points |
+| [Voice pipeline](voice_pipeline.md) | Local providers, pronunciation lexicons, measured sentence windows, and listening review |
+| [Dependencies and licensing boundaries](dependencies.md) | Runtime locks, third-party notices, and outstanding reviews |
+| [Implementation and acceptance status](implementation_status.md) | Implemented capabilities, validation scope, and remaining acceptance gates |
+| [Plugin roadmap](plugin_roadmap.md) | Staged goals and release-readiness requirements |
+| [Repository scope](repository_scope.md) | The file allowlist, history isolation, and future commits |
+| [Contributing](../CONTRIBUTING.md) | Community changes, checks, and review expectations |
 
-制作一期时，在本地工程建立本期 brief 和唯一 authoring 来源；数学说明、旁白、
-实际句窗、场景与交付记录使用相同稳定 ID。文档里的 `episode`、`example` 是占位名，
-对应文件由具体制作任务提供，仓库没有内置成片样例。
+For each video, create a brief and a single authoring source in a local project.
+The mathematical explanation, narration, measured sentence windows, scenes, and
+delivery records must share stable IDs. Names such as `episode` and `example` in
+the documentation are placeholders supplied by the production task; the repository
+does not contain a finished example video.
 
-安装者先按根 [README](../README.md) 建立独立工作区，再填写创作源。框架代码、运行时、
-模型缓存与用户作品分开存放；不能把插件目录当作本期工程。候选预设尚待作者看片与
-听音确认，安装或自动检查成功均不代表这一门槛已经完成。
+Start with the root [README](../README.md) and the installation guide, create a
+separate user workspace, and then complete its authoring source. Framework code,
+runtimes, model caches, and user work belong in separate locations. The plugin
+installation directory is not a video project. The candidate presets still need
+the author's visual and listening approval; installation or automated checks do
+not complete that review.

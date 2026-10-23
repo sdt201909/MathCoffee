@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -28,6 +27,8 @@ def parser() -> argparse.ArgumentParser:
             sub.add_argument("--preset", default="mathcoffee-shorts@1")
             sub.add_argument("--brand", default="")
             sub.add_argument("--title", default="")
+        elif name == "doctor":
+            sub.add_argument("--profile", choices=("core", "render", "full"), default="full")
         elif name == "voice":
             sub.add_argument("--generate", action="store_true")
         elif name in {"render", "verify", "resume"}:
@@ -50,7 +51,7 @@ def run(args: argparse.Namespace) -> dict:
         return setup(args.component, execute=args.execute, wheel=args.wheel)
     if command == "doctor":
         from mathcoffee.environment import doctor
-        return doctor(load_project(args.workspace) if args.workspace else None)
+        return doctor(load_project(args.workspace) if args.workspace else None, profile=args.profile)
     if command == "init":
         if not args.workspace:
             raise ValueError("init requires --workspace pointing to a new directory")
@@ -84,14 +85,14 @@ def _render_local(command: str, workspace: str, quality: str) -> dict:
 
 
 def _render_worker(args: argparse.Namespace) -> dict:
-    from mathcoffee.environment import runtime_for
+    from mathcoffee.environment import runtime_environment, runtime_for
     from mathcoffee.workspace import load_project
     from mathcoffee.voice import _worker_bootstrap
     runtime = runtime_for(load_project(args.workspace))
     python = runtime.get("render_python") or sys.executable
     package, binding = _worker_bootstrap()
     code = binding + "\nimport json\nfrom mathcoffee.cli import _render_local\ntry:\n result=_render_local(sys.argv[1],sys.argv[2],sys.argv[3])\n print(json.dumps(result,ensure_ascii=False,allow_nan=False))\nexcept Exception as e:\n print(json.dumps({'status':'blocked','error':type(e).__name__,'message':str(e)},ensure_ascii=False))\n sys.exit(2)\n"
-    env = os.environ.copy()
+    env = runtime_environment(runtime)
     env.update(PYTHONDONTWRITEBYTECODE="1", HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1", HF_HUB_DISABLE_IMPLICIT_TOKEN="1")
     quality = "draft" if args.command == "preview" else args.quality
     output = subprocess.run([str(python), "-I", "-c", code, package, args.command, str(args.workspace.resolve()), quality], capture_output=True, text=True, env=env)

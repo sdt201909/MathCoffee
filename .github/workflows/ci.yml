@@ -1,0 +1,113 @@
+name: Framework checks
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  framework:
+    name: Core planning and installed wheel
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      UV_PYTHON_DOWNLOADS: never
+      PYTHONDONTWRITEBYTECODE: "1"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Install pinned build tools
+        run: python -m pip install "uv==0.13.5" "uv_build==0.11.32"
+      - name: Check reviewed repository history
+        run: python scripts/repository_guard.py --ref HEAD --history
+      - name: Test planning, CLI, bundles and bootstrap without media dependencies
+        env:
+          PYTHONPATH: src
+        run: >-
+          python -m unittest
+          tests.test_project_style tests.test_cli_runtime tests.test_plugin_bundle
+          tests.test_repository_guard tests.test_bootstrap
+      - name: Build and smoke-test an isolated installed wheel
+        run: |
+          uv build --wheel --no-build-isolation --out-dir "$RUNNER_TEMP/mathcoffee wheel"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+          import tempfile
+
+          base = Path(tempfile.mkdtemp(prefix="mathcoffee installed "))
+          core = base / "core with spaces"
+          workspace = base / "new video project"
+          wheels = list((Path(os.environ["RUNNER_TEMP"]) / "mathcoffee wheel").glob("*.whl"))
+          assert len(wheels) == 1
+          subprocess.run(["uv", "venv", "--python", sys.executable, str(core)], check=True)
+          python = str(core / "bin/python")
+          subprocess.run(["uv", "pip", "install", "--offline", "--no-deps", "--python", python, str(wheels[0])], check=True)
+          env = os.environ.copy()
+          env.pop("PYTHONPATH", None)
+          env.update(MATHCOFFEE_DATA_HOME=str(base / "runtime"), MATHCOFFEE_CACHE_HOME=str(base / "cache"))
+          (base / "mathcoffee.py").write_text("raise RuntimeError('checkout shadowed installed package')\n")
+          probe = "import json,mathcoffee,importlib.util; print(json.dumps({'package':mathcoffee.__file__,'optional':{n:importlib.util.find_spec(n) is not None for n in ['manim','numpy','av','soundfile']}}))"
+          info = json.loads(subprocess.check_output([python, "-I", "-B", "-c", probe], env=env, cwd=base, text=True))
+          assert not any(info["optional"].values()), info
+          package = Path(info["package"]).parent
+          def identities():
+              return {str(p.relative_to(package)): hashlib.sha256(p.read_bytes()).hexdigest() for p in package.rglob("*") if p.is_file()}
+          before = identities()
+          for path in package.rglob("*"):
+              if path.is_file():
+                  path.chmod(0o444)
+          for path in sorted(package.rglob("*"), reverse=True):
+              if path.is_dir():
+                  path.chmod(0o555)
+          package.chmod(0o555)
+          cases = [
+              (["init", "--workspace", str(workspace), "--brand", "Example channel", "--title", "A mathematical question"], 0, "initialized"),
+              (["plan", "--workspace", str(workspace)], 3, "incomplete"),
+              (["doctor", "--workspace", str(workspace)], 0, "setup_required"),
+              (["setup", "--component", "render"], 0, "setup_plan"),
+          ]
+          for args, code, status in cases:
+              result = subprocess.run([python, "-I", "-B", "-m", "mathcoffee", *args], env=env, cwd=base, capture_output=True, text=True)
+              assert result.returncode == code, result.stderr + result.stdout
+              assert json.loads(result.stdout)["status"] == status, result.stdout
+          assert identities() == before, "installed package changed"
+          assert not (base / "runtime").exists()
+          assert not (base / "cache").exists()
+          print("Installed wheel: isolated core, spaced paths, model-free planning and read-only package passed.")
+          PY
+
+  remotion:
+    name: Remotion types and contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: engines/remotion
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install pinned npm dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-audit --no-fund --registry https://registry.npmjs.org
+      - run: npm run typecheck
+      - run: npm test

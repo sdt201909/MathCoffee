@@ -5,30 +5,44 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import posixpath
+import re
 import stat
 import tempfile
 import zipfile
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
+from urllib.parse import quote
 
 SKILL_NAMES = ("setup", "create", "review", "revise")
 SHARED_FILES = (
-    "bin/mathcoffee",
+    "bin/mathcoffee", "bin/setup-macos", "bin/bootstrap.py",
+    "LICENSE", "NOTICE", "README.md", "README.zh-CN.md", "Brewfile",
+    "CONTRIBUTING.md", "CONTRIBUTING.zh-CN.md", "SECURITY.md", "SECURITY.zh-CN.md",
+    "THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.zh-CN.md",
+    *(f"docs/{name}{language}.md" for name in (
+        "README", "installation", "audience_contract", "dependencies", "engine_integration",
+        "implementation_status", "plugin_roadmap", "production_workflow", "project_interface",
+        "repository_scope", "style_baseline", "voice_pipeline",
+    ) for language in ("", ".zh-CN")),
+    "AGENTS.md", "AGENTS.zh-CN.md",
     *(f"skills/{name}/SKILL.md" for name in SKILL_NAMES),
     "skills/create/references/workflow.md",
 )
 ENGINE_FILES = (
+    "README.md", "README.zh-CN.md",
     "package.json", "package-lock.json", "tsconfig.json", "render.mjs", "render-shorts.mjs",
     "src/Timeline.tsx", "src/index.tsx", "src/schema.ts", "src/Shorts.tsx",
     "src/shorts-index.tsx", "src/shorts-schema.ts",
 )
 TOOLCHAIN_FILES = (
     "render/requirements.lock",
+    "speech/README.md", "speech/README.zh-CN.md", "speech/licenses.json",
     "speech/requirements.in", "speech/requirements.lock", "speech/setup.sh",
     "speech/fetch_model.py", "speech/doctor.py", "speech/smoke.py",
     "speech/LICENSE-Qwen3-TTS.txt", "speech/LICENSE-mlx-audio.txt",
     "voice_qa/requirements.in", "voice_qa/requirements.lock", "voice_qa/setup.sh",
-    "voice_qa/fetch_model.py",
+    "voice_qa/fetch_model.py", "voice_qa/README.md", "voice_qa/README.zh-CN.md",
 )
 HOST_MANIFESTS = {"codex": "plugin.json", "claude": ".claude-plugin/plugin.json"}
 HOST_MARKETPLACES = {
@@ -96,6 +110,25 @@ def _marketplace(host: str, source: bytes) -> dict:
     return catalog
 
 
+def _document_links(files: dict[str, bytes], version: str) -> None:
+    """Keep bundled docs local; link excluded implementation files to this release."""
+    for name, data in list(files.items()):
+        if not name.endswith(".md"):
+            continue
+
+        def replace(match):
+            destination = match.group(1)
+            if ":" in destination or destination.startswith(("#", "/", "<")):
+                return match.group(0)
+            path, separator, anchor = destination.partition("#")
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(name), path))
+            if not path or target in files or target.startswith("../"):
+                return match.group(0)
+            return "](https://github.com/sdt201909/MathCoffee/blob/v" + version + "/" + quote(target, safe="/") + (separator + anchor if separator else "") + ")"
+
+        files[name] = re.sub(r"\]\(([^)\s]+)\)", replace, data.decode("utf-8")).encode("utf-8")
+
+
 def _wheel_metadata(path: Path) -> dict[str, str]:
     if path.suffix != ".whl" or path.is_symlink() or not path.is_file():
         raise ValueError("wheel_path must select a regular MathCoffee .whl file")
@@ -161,6 +194,7 @@ def build_bundle(output: Path, host: str = "codex", wheel_path: Path | None = No
     files.update({f"toolchains/{name}": _read_regular(toolchain_root, name)
                   for name in TOOLCHAIN_FILES})
     files[f"wheels/{wheel_path.name}"] = wheel_path.read_bytes()
+    _document_links(files, manifest["version"])
     entries = {name: {"bytes": len(data), "sha256": _hash(data)}
                for name, data in sorted(files.items())}
     receipt = {
@@ -184,7 +218,7 @@ def build_bundle(output: Path, host: str = "codex", wheel_path: Path | None = No
                 entry = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
                 entry.compress_type = zipfile.ZIP_DEFLATED
                 entry.create_system = 3
-                entry.external_attr = (0o100755 if name == "bin/mathcoffee" else 0o100644) << 16
+                entry.external_attr = (0o100755 if name in {"bin/mathcoffee", "bin/setup-macos"} else 0o100644) << 16
                 archive.writestr(entry, data)
         validate_bundle(temporary_archive)
         os.link(temporary_archive, output)

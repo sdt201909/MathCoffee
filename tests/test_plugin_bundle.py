@@ -11,7 +11,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from mathcoffee import plugin_bundle as bundle
+from mathcoffee import __version__, plugin_bundle as bundle
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -21,15 +21,15 @@ class PluginBundleTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix="mathcoffee bundle ")
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
-        self.wheel = self.directory / "mathcoffee-0.2.0a1-py3-none-any.whl"
+        self.wheel = self.directory / f"mathcoffee-{__version__}-py3-none-any.whl"
         self.write_wheel()
 
-    def write_wheel(self, *, name="MathCoffee", version="0.2.0a1", cli=True, extra=None):
+    def write_wheel(self, *, name="MathCoffee", version=__version__, cli=True, extra=None):
         with zipfile.ZipFile(self.wheel, "w") as archive:
-            archive.writestr("mathcoffee-0.2.0a1.dist-info/METADATA",
+            archive.writestr(f"mathcoffee-{__version__}.dist-info/METADATA",
                              f"Metadata-Version: 2.3\nName: {name}\nVersion: {version}\n")
             if cli:
-                archive.writestr("mathcoffee-0.2.0a1.dist-info/entry_points.txt",
+                archive.writestr(f"mathcoffee-{__version__}.dist-info/entry_points.txt",
                                  "[console_scripts]\nmathcoffee = mathcoffee.cli:main\n")
             archive.writestr("mathcoffee/__main__.py", "# fixture entry point\n")
             archive.writestr("mathcoffee/data/presets/shorts.json", "{}")

@@ -1,33 +1,51 @@
-# MathCoffee 候选风格基线 v1
+# MathCoffee candidate style baseline v1
 
-两个预设从当前本地创作约定提炼，重新实现通用组件；没有复制历史单集的场景、正文
-或媒体。预设身份目前是 `pending_author_confirmation`，校准片与真实试听确认后才可
-宣布达到作者认可的默认风格。自定义预设记录 diff，按其自身结果验收。
+English | [简体中文](style_baseline.zh-CN.md)
 
-| 项目 | shorts | longform |
+Both presets were extracted from the current local production conventions and
+implemented as new generic components. No historical episode scenes, scripts,
+or media were copied. Presets remain `pending_author_confirmation`: only review
+of calibration videos and real listening can establish that the default style
+has the author's approval. Custom presets record a diff and are evaluated on
+their own results.
+
+| Setting | Shorts | Longform |
 |---|---|---|
-| 正式画幅 | 1080×1920／60 | 1920×1080／60 |
-| 低清 | 540×960／30 | 960×540／30 |
-| 背景 | #070C13 | #07111B |
-| 对象 A／B | #4EA1FF／#70E1E8 | #65B7EE／#72D5D6 |
-| 结果／重点 | #FFD166 | #F0C777 |
-| 正文 | #F4F7FB | #EFF4F5 |
-| 字体 | Heiti SC；显式回退链 | Heiti SC；显式回退链 |
-| 核心公式停留 | 至少6秒 | 至少4秒 |
-| 结论停留 | 至少6秒 | 至少6秒 |
-| 默认烧录旁白字幕 | 关闭 | 开启 |
+| Final canvas | 1080×1920 / 60 fps | 1920×1080 / 60 fps |
+| Draft canvas | 540×960 / 30 fps | 960×540 / 30 fps |
+| Background | #070C13 | #07111B |
+| Objects A / B | #4EA1FF / #70E1E8 | #65B7EE / #72D5D6 |
+| Result / emphasis | #FFD166 | #F0C777 |
+| Body text | #F4F7FB | #EFF4F5 |
+| Font | Heiti SC with an explicit fallback chain | Heiti SC with an explicit fallback chain |
+| Core formula hold | At least 6 seconds | At least 4 seconds |
+| Conclusion hold | At least 6 seconds | At least 6 seconds |
+| Burned-in narration captions by default | Off | On |
 
-颜色同时配文字或数值，不仅靠颜色表达条件。标题、品牌、主图、公式、字幕使用
-同一像素配置，按画幅缩放；不为某种主题强制三栏或固定章节数。超预算文字明确报错，
-不截断，不用隐式缩小文字掩盖版式问题。实际字体解析、边界和中间动作另存回执。
+Pair colors with text or values; do not encode a condition through color alone.
+Titles, branding, diagrams, formulas, and captions use the same pixel-based
+configuration, scaled to the canvas. A topic is not forced into three columns
+or a fixed chapter count. Remotion text budgets reject overflow without
+truncating text. Manim component bounds and fitting ratios are recorded, and
+excessive shrinking is rejected. Actual font resolution, bounds, and action
+checks are retained in separate receipts.
 
-讲述从可观察的问题进入，以同一主例推进；工具由已知结果和剩余障碍引出。数学状态
-来自模型，不让画面插值伪造因果。结尾回扣问题、给出适用条件与观众可读学术来源，
-制作、引擎、版本和验收信息不能进入旁白、字幕或片尾。
+Begin with an observable question and develop one main example. Introduce a new
+tool because of the known result and the obstacle that remains. Mathematical
+states come from the model; visual interpolation must not invent causality.
+The ending returns to the question, states applicability conditions, and gives
+audience-readable academic sources. Production, engine, version, and acceptance
+information must not enter narration, captions, or the ending.
 
-默认声音请求为 Serena／science_female／full_text，清晰理性、均匀略快；相同参数
-不保证跨句听感一致。样音覆盖多音字、数字、中英混读、图形标签和相邻句，听审与
-代理指标分开记录。音乐按标签确定性选取，并按实际活动窗让位于旁白；可以显式静音。
+The default voice request is Serena / `science_female` / `full_text`: clear,
+rational, even, and slightly brisk. Identical parameters do not guarantee
+consistent delivery between sentences. Voice samples must cover ambiguous
+pronunciations, numbers, Chinese/English mixing, diagram labels, and adjacent
+sentence joins. Listening review and proxy metrics are recorded separately.
+Music is selected deterministically by tags and yields to narration using
+measured activity windows. Explicit silence is allowed.
 
-校准验收分开检查：自动几何／边界、真实编码中间帧、连续论述、实际声音和目标观众
-复述。不能把已有影片的偏好、单元测试或一张接触表说成整个新主题已被认可。
+Calibration reviews distinguish automated geometry/bounds checks, actual encoded
+intermediate frames, continuous reasoning, real audio, and the target audience's
+ability to explain the idea back. Preferences from previous videos, unit tests,
+or a single contact sheet do not establish acceptance of an entire new topic.

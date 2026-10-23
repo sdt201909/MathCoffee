@@ -1,10 +1,17 @@
 [project]
 name = "mathcoffee"
-version = "0.2.0a1"
+version = "0.2.0a2"
 description = "Local, agent-native mathematical video production with versioned style presets."
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
 requires-python = ">=3.13,<3.14"
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/sdt201909/MathCoffee"
+Issues = "https://github.com/sdt201909/MathCoffee/issues"
+Documentation = "https://github.com/sdt201909/MathCoffee/blob/main/docs/README.md"
 
 [project.scripts]
 mathcoffee = "mathcoffee.cli:main"
@@ -25,7 +32,7 @@ build-backend = "mathcoffee_build"
 backend-path = ["."]
 
 [tool.uv.build-backend]
-source-include = ["mathcoffee_build.py", "repository-files.txt", "engines/remotion/**", "toolchains/**", "skills/**", "bin/**", "plugin.json", ".claude-plugin/**", ".agents/**", "uv.lock"]
+source-include = [".gitignore", ".python-version", "Makefile", "manim.cfg", "mathcoffee_build.py", "repository-files.txt", "engines/remotion/**", "toolchains/**", "skills/**", "bin/**", "plugin.json", ".claude-plugin/**", ".agents/**", "uv.lock", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES*.md", "README.zh-CN.md", "CONTRIBUTING*.md", "SECURITY*.md", "Brewfile", "AGENTS*.md", "docs/**", "tests/**", "scripts/**", ".github/**"]
 source-exclude = ["node_modules", "__pycache__", ".npm-cache", ".cache", "out", "*.pyc"]
 
 [tool.ruff]

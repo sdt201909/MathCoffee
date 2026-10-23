@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible framework or installation problem. English or Chinese is welcome.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use synthetic inputs and redact secrets, personal paths and private production content.
+        Do not upload full episodes, media, model weights or credentials.
+        For vulnerabilities, follow [SECURITY.md](https://github.com/sdt201909/MathCoffee/blob/main/SECURITY.md).
+        [Contribution guide](https://github.com/sdt201909/MathCoffee/blob/main/CONTRIBUTING.md) · [中文](https://github.com/sdt201909/MathCoffee/blob/main/CONTRIBUTING.zh-CN.md)
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Include the release tag or commit and how MathCoffee was installed.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: macOS version, architecture and relevant Python/Node/tool versions. Redact personal paths.
+    validations:
+      required: true
+  - type: dropdown
+    id: host
+    attributes:
+      label: Host
+      options:
+        - Local CLI
+        - Codex
+        - Claude Code
+        - Source development
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Exact commands and the smallest synthetic configuration that reproduce the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics and verification scope
+      description: Relevant doctor/status output or error excerpts. State checks run and not run, without uploading private narration or assets.

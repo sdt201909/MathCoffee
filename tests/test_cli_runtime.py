@@ -405,6 +405,10 @@ class DoctorAndSetupTests(RuntimeCase):
         browser.parent.mkdir()
         browser.write_text("browser fixture")
         browser.chmod(0o755)
+        tex = {}
+        for name in ("standalone.cls", "unicode-math.sty", "latinmodern-math.otf"):
+            tex[name] = self.directory / name
+            tex[name].write_text("TeX lookup fixture")
         runtime = {
             "render_python": "/fake/render/python",
             "speech_python": "/fake/speech/python",
@@ -418,9 +422,13 @@ class DoctorAndSetupTests(RuntimeCase):
                 {"version": "4.0.532" if mismatch == "remotion" else "4.0.531"},
             )
 
-            def probe(command, mismatch=mismatch):
+            def probe(command, mismatch=mismatch, **_kwargs):
                 code = " ".join(command)
-                if "mlx-audio" in code:
+                if "list_fonts" in code:
+                    detail = json.dumps(["Heiti SC"])
+                elif command[-1] in tex:
+                    detail = str(tex[command[-1]])
+                elif "mlx-audio" in code:
                     detail = "0.6.0" if mismatch == "speech" else "0.5.7"
                 elif "manim" in code:
                     detail = "0.20.2" if mismatch == "manim" else "0.20.1"
@@ -437,7 +445,7 @@ class DoctorAndSetupTests(RuntimeCase):
                     side_effect=probe,
                 ),
                 patch.object(
-                    environment.shutil, "which", side_effect=lambda name: f"/fake/bin/{name}"
+                    environment.shutil, "which", side_effect=lambda name, **_kwargs: f"/fake/bin/{name}"
                 ),
                 patch.object(
                     environment.platform,
@@ -473,14 +481,130 @@ class DoctorAndSetupTests(RuntimeCase):
         self.assertFalse(self.data.exists())
         self.assertFalse(self.cache.exists())
 
+    def test_core_profile_reports_missing_components_without_requiring_them(self):
+        with (
+            patch.object(environment, "runtime_for", return_value={}),
+            patch.object(environment, "_probe", return_value={"available": False, "detail": "not installed"}),
+            patch.object(environment.shutil, "which", return_value=None),
+            patch.object(environment.platform, "system", return_value="Darwin"),
+            patch.object(environment.platform, "machine", return_value="arm64"),
+        ):
+            code, result = self.invoke("doctor", "--profile", "core")
+        self.assertEqual(code, 0)
+        self.assertEqual(result["profile"], "core")
+        self.assertEqual(result["status"], "ready")
+        self.assertEqual(result["required_checks"], ["core", "platform"])
+        self.assertEqual(result["missing_required"], [])
+        self.assertFalse(result["checks"]["manim"]["available"])
+        self.assertFalse(result["checks"]["model"]["available"])
+        self.assertTrue(result["planning_available"])
+        self.assertFalse(self.data.exists())
+        self.assertFalse(self.cache.exists())
+
+    def test_render_profile_accepts_imported_voice_without_speech_or_model(self):
+        runtime = {"render_python": "/fake/render/python"}
+        engine = self.directory / "engine"
+        save(engine / "node_modules/remotion/package.json", {"version": "4.0.531"})
+        runtime["remotion_root"] = str(engine)
+        browser = self.directory / "browser"
+        browser.write_text("browser fixture")
+        runtime["browser_executable"] = str(browser)
+        tex = {}
+        for name in ("standalone.cls", "unicode-math.sty", "latinmodern-math.otf"):
+            tex[name] = self.directory / name
+            tex[name].write_text("TeX resource fixture")
+
+        def probe(command, **_kwargs):
+            if "list_fonts" in " ".join(command):
+                detail = json.dumps(["PingFang SC"])
+            elif command[-1] in tex:
+                detail = str(tex[command[-1]])
+            elif command[-1] == "--version":
+                detail = "v24.21.0"
+            else:
+                detail = "0.20.1"
+            return {"available": True, "detail": detail}
+
+        with (
+            patch.object(environment, "runtime_for", return_value=runtime),
+            patch.object(environment, "_probe", side_effect=probe),
+            patch.object(environment.shutil, "which", side_effect=lambda name, **_kwargs: f"/fake/bin/{name}"),
+            patch.object(environment.platform, "system", return_value="Darwin"),
+            patch.object(environment.platform, "machine", return_value="arm64"),
+        ):
+            result = environment.doctor(profile="render")
+            full = environment.doctor()
+        self.assertEqual(result["status"], "ready")
+        self.assertEqual(result["checks"]["fonts"]["resolved"], "PingFang SC")
+        self.assertTrue(result["checks"]["fonts"]["fallback_used"])
+        self.assertTrue(result["checks"]["tex_resources"]["available"])
+        self.assertNotIn("speech", result["required_checks"])
+        self.assertEqual(full["status"], "setup_required")
+        self.assertEqual(full["missing_required"], ["speech", "model"])
+
+    def test_font_and_tex_resource_checks_fail_missing_defaults_without_compilation(self):
+        from mathcoffee.style import resolve_style
+
+        style = resolve_style("mathcoffee-shorts@1")
+        child = environment.runtime_environment({})
+        with patch.object(environment, "_probe", return_value={"available": True, "detail": "[]"}):
+            fonts = environment._font_check("/fake/python", style, child)
+        self.assertFalse(fonts["available"])
+        self.assertIsNone(fonts["resolved"])
+        calls = []
+
+        def lookup(command, **_kwargs):
+            calls.append(command)
+            return {"available": True, "detail": str(self.directory / command[-1])}
+
+        with patch.object(environment, "_probe", side_effect=lookup):
+            tex = environment._tex_check("/fake/kpsewhich", style, child)
+        self.assertFalse(tex["available"])
+        self.assertEqual([c[1] for c in calls], ["standalone.cls", "unicode-math.sty", "latinmodern-math.otf"])
+        self.assertTrue(all(c[0] == "/fake/kpsewhich" for c in calls))
+        style["font"]["formula"] = "Custom Math Face"
+        with patch.object(environment, "_probe", side_effect=lookup):
+            custom = environment._tex_check("/fake/kpsewhich", style, child)
+        self.assertEqual(custom["formula_font"]["status"], "not_verified")
+        self.assertIn("custom math fonts", custom["formula_font"]["scope"])
+
+    def test_render_worker_uses_registered_node_without_editing_the_shell_path(self):
+        binary = self.directory / "node24 bin/node"
+        binary.parent.mkdir()
+        binary.write_text("node fixture")
+        runtime = {"render_python": "/fake/render/python", "node": str(binary)}
+        ambient = "/usr/bin:/bin"
+        with (
+            patch.dict(os.environ, {"PATH": ambient}),
+            patch.object(environment, "runtime_for", return_value=runtime),
+            patch.object(cli.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout='{"status":"PASS"}', stderr="")) as run,
+        ):
+            result = cli._render_worker(SimpleNamespace(command="preview", workspace=self.workspace))
+            self.assertEqual(os.environ["PATH"], ambient)
+        self.assertEqual(result["status"], "PASS")
+        child_path = run.call_args.kwargs["env"]["PATH"].split(os.pathsep)
+        self.assertEqual(child_path[0], str(binary.parent))
+        for name in ("/Library/TeX/texbin", "/opt/homebrew/bin"):
+            if Path(name).is_dir():
+                self.assertIn(name, child_path)
+        self.assertEqual(len(child_path), len(set(child_path)))
+
     def test_failed_managed_install_resumes_only_unfinished_commands(self):
         calls = []
         failed = False
         browser = self.cache / __version__ / "remotion/.remotion/chrome-headless-shell"
+        node = self.directory / "registered node24/bin/node"
+        node.parent.mkdir(parents=True)
+        node.write_text("registered Node.js fixture")
+        node.chmod(0o755)
+        save(self.data / "runtime.json", {"node": str(node)})
 
-        def execute(command, **_kwargs):
+        def execute(command, **kwargs):
             nonlocal failed
             calls.append(command)
+            if command[1] == "--version":
+                self.assertEqual(command[0], str(node))
+                return SimpleNamespace(returncode=0, stdout="v24.21.0", stderr="")
             if command[1] == "venv":
                 interpreter = Path(command[-1]) / "bin/python"
                 interpreter.parent.mkdir(parents=True)
@@ -488,7 +612,9 @@ class DoctorAndSetupTests(RuntimeCase):
             elif command[1:3] == ["pip", "sync"] and not failed:
                 failed = True
                 raise subprocess.CalledProcessError(1, command)
-            elif command[0] == "node" and command[1] == "-e":
+            elif Path(command[0]).name == "node" and command[1] == "-e":
+                self.assertEqual(command[0], str(node))
+                self.assertEqual(kwargs["env"]["PATH"].split(os.pathsep)[0], str(node.parent))
                 self.assertIn("ensureBrowser", command[2])
                 browser.parent.mkdir(parents=True)
                 browser.write_text("prepared browser fixture")
@@ -520,10 +646,21 @@ class DoctorAndSetupTests(RuntimeCase):
             str(self.data / "runtimes" / __version__ / "render/bin/python"),
         )
         self.assertEqual(result["runtime"]["browser_executable"], str(browser))
+        self.assertEqual(result["runtime"]["node"], result["selected_node"])
         self.assertTrue(Path(result["runtime"]["browser_executable"]).is_file())
         self.assertEqual(
             json.loads((self.data / "runtime.json").read_text())["browser_executable"], str(browser)
         )
+
+    def test_render_setup_rejects_wrong_node_major_before_installing_dependencies(self):
+        with (
+            patch.object(environment, "data_path", side_effect=self.resources()),
+            patch.object(environment, "_probe", return_value={"available": True, "detail": "v25.0.0"}),
+            patch.object(environment.subprocess, "run", side_effect=AssertionError("unexpected dependency installation")),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "Node.js 24 is required"):
+                environment.setup("render", execute=True)
+        self.assertFalse((self.data / "runtimes" / __version__ / "render/bin/python").exists())
 
     def test_retained_receipt_does_not_authorize_a_replaced_environment_symlink(self):
         managed = self.data / "runtimes" / __version__ / "speech"

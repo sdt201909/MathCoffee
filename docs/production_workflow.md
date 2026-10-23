@@ -1,139 +1,189 @@
-# 从创作任务到视频交付
+English | [简体中文](production_workflow.zh-CN.md)
 
-本流程用于新一期或明确授权的修订。已发布作品保留自己的 authoring、依赖和验收
-依据，不因引擎或声音升级自动重制。操作边界见 [AGENTS.md](../AGENTS.md)。
+# From a production brief to a verified video
 
-## 1. 建立任务入口
+Use this workflow for a new video or an explicitly authorized revision. Published work retains its
+own authoring source, dependencies, and acceptance evidence; an engine or voice upgrade does not
+automatically authorize a remake. See [AGENTS.md](../AGENTS.md) for operating boundaries.
 
-先检查工作区改动、现有环境、相近单集和可复用资产。将本次约束集中写入一份
-`docs/<episode>_production_plan.md`，不要为相同信息再建多个进度清单。
+## 1. Establish the brief
 
-brief 至少说明：面向谁、回答什么、观众需要哪些前置知识、论述和故事边界、目标
-时长与画幅、交付物、已获授权的外部来源，以及本次明确不做的发布或旧集重制。
-目标时长用于控制论述，不能靠重复解释填满预算。
+Inspect workspace changes, existing environments, related episodes, and reusable assets first.
+Keep the task's constraints in one `docs/<episode>_production_plan.md`; do not maintain several
+progress documents containing the same information.
 
-为章节、镜头、旁白句、事件和资产分配稳定 ID。优先沿用本期 authoring 结构；
-新建结构时先验证必填字段、ID 唯一性、引用完整性和非负时间，避免制作中出现平行副本。
-README 负责入口，单集计划负责创作，机器清单负责精确数据，验收报告负责实测结果。
+The brief must identify the audience, the question being answered, required prior knowledge,
+mathematical and narrative scope, target duration and aspect ratio, deliverables, authorized external
+sources, and any publication or remake of older episodes explicitly outside this task. Target
+duration controls the argument; repeated explanations must not be added merely to fill it.
 
-## 2. 审校论述与选定表现方式
+Assign stable IDs to chapters, shots, narration sentences, events, and assets. Prefer the episode's
+existing authoring structure. For a new structure, validate required fields, unique IDs, complete
+references, and nonnegative times before creating derived copies. The README is the entry point,
+the episode plan guides creation, machine manifests hold precise data, and acceptance reports record
+actual measurements.
 
-先完成完整旁白和场景计划，再独立审校数学与故事。数学说明记录定义、假设、推导、
-近似和适用边界；引用可核验的原始资料，记录具体出处及访问日期。自创教学数值、
-随机模拟和现实结论分开标明，随机过程保存种子与参数。
+## 2. Review the argument and choose the presentation
 
-故事审校检查人物动机、当时已知信息、因果顺序与公平展示的证据。回放读取原事件，
-不得重新编造一次动作。显示的数字、图表、几何位置和状态关系来自共同模型，
-不要用画面插值伪造数学过程。
+Complete the narration and scene plan before independent mathematical and narrative review. Record
+definitions, assumptions, derivations, approximations, and applicability limits in the mathematical
+notes. Cite verifiable primary sources with exact references and access dates. Distinguish invented
+teaching values, random simulations, and claims about reality; preserve seeds and parameters for
+random processes.
 
-沿真实播放顺序检查观众正在解决的问题、已经得到的结果、剩下的障碍及下一概念的
-必要性。过渡应由上一段的观察或推理引出，不能只加一句概念预告。先删减不推进
-主问题的技术旁枝，再补缺失推理；不为章节数或时长保留重复解释。把断点时间戳、
-修订理由和代表性跨章连续样段审查写入本期记录，技术测试不能替代这项审查。
-成片与片尾的受众、显式显示文字清单及自动检查见[受众约定](audience_contract.md)。
+Narrative review checks character motivation, information available at the time, causal order, and
+fairly presented evidence. Replays read the original event record; they must not invent a new
+action. Displayed numbers, plots, geometric positions, and state relationships come from a shared
+model. Visual interpolation must not fabricate a mathematical process.
 
-Manim 承担几何、数学变换和计算可视化；Remotion 承担叙事版式、分屏、信息层与
-镜头编排。按表达需求逐段选择，不为使用新工具而迁移现有可靠模块。
-需要两个引擎时先验证短样片的接口，再扩展整片；见[双引擎接口](engine_integration.md)。
+Follow actual playback order and ask what the audience is solving, what has been established, what
+obstacle remains, and why the next concept is needed. Transitions must follow from the preceding
+observation or reasoning, rather than merely announce another concept. Remove technical digressions
+that do not advance the main question, then supply missing reasoning. Chapter count and duration do
+not justify repetition. Record breakpoints, timestamps, revision reasons, and reviews of
+representative continuous passages across chapters. Technical tests do not replace this review.
+See the [audience contract](audience_contract.md) for viewer-facing content, endings, declared
+display text, and automated checks.
 
-## 3. 准备资产、声音与配乐
+Manim handles geometry, mathematical transformations, and computational visualization. Remotion
+handles narrative layout, split screens, information layers, and shot sequencing. Choose each
+engine according to the passage's needs; do not replace reliable modules merely to use a new tool.
+When both engines are needed, verify their interface on a short sample before expanding the film;
+see the [engine contract](engine_integration.md).
 
-资源归入本期命名空间，复用共享组件时记录依赖。每项外部或生成资产的元数据应能
-回答下列问题；字段形式可复用既有 manifest，不必另建同义清单。
+## 3. Prepare assets, voice, and music
 
-| 资产信息 | 应记录的依据 |
+Place resources in the episode's namespace and record dependencies when reusing shared components.
+Metadata for each external or generated asset must answer the following questions. Existing
+manifest fields may be reused; do not create a second list with synonymous fields.
+
+| Asset information | Evidence to preserve |
 |---|---|
-| 身份与用途 | 稳定 ID、本机相对路径、版本／哈希、所属集数、镜头或段落 |
-| 来源与权利 | 作者、来源链接或原创生成脚本、许可证文本／链接、获取日期、署名要求及用途限制 |
-| 重建条件 | 生成参数、种子、工具／模型版本；不可重建的原始资产要保留 |
-| 媒体规格 | 图像尺寸／透明度／字体；音频采样率／声道／时长；视频尺寸／帧率／音轨 |
+| Identity and use | Stable ID, local relative path, version/hash, episode, shot, or passage |
+| Source and rights | Author, source link or original generation script, license text/link, acquisition date, attribution requirements, and usage restrictions |
+| Rebuild conditions | Generation parameters, seeds, tool/model versions; retain irreplaceable originals |
+| Media specifications | Image size/transparency/fonts; audio sample rate/channels/duration; video dimensions/frame rate/audio tracks |
 
-只有已授权的自有资源、项目原创或许可明确的素材可以进入成片。未知版权的网络
-音乐不能当占位正式发布；代码绘制适合原生矢量视觉，不应假称生成插画。
+Only authorized owned assets, original project assets, or clearly licensed materials may appear in
+the film. Online music with unknown rights is not a publishable placeholder. Code drawing is
+appropriate for native vector visuals; do not describe it as generated illustration.
 
-配音先做代表性短句，覆盖多音字、数字、公式口述、人名、英文词与同一句中英混读。
-保留原始中文／英文正文；数值展开、发音别名与上下文词典由 provider 前处理派生，
-记录每次命中，不能为纠音静默改写字幕含义。词典需有正例、反例及歧义上下文测试。
-图形标记的身份贯穿画面、旁白、字幕和模型输入：字母点名按字母读，不能另换成
-甲乙丙。下标与撇号可作显式读法展开，原字幕字形保留；标签序列检查应阻止词典
-将 A 改名、丢失下标或重复标签。实际单字母发音仍需听音，见配音管线的图形标签约定。
+Start voice work with representative short samples covering Chinese polyphonic characters,
+numbers, spoken formulas, names, English words, and Chinese/English mixing within one sentence.
+Preserve the original Chinese/English text. The provider's preprocessing derives separate numeric
+expansions, pronunciation aliases, and context-dictionary substitutions, recording each match.
+Pronunciation fixes must not silently change subtitle meaning. Dictionaries need positive,
+negative, and ambiguous-context tests. Diagram labels retain their identity across picture,
+narration, subtitles, and model input: read letter names as letters, rather than replacing A/B/C
+with 甲/乙/丙. Subscripts and primes may have explicit spoken expansions while subtitles preserve
+the original glyphs. Label-sequence checks must prevent renaming A, losing subscripts, or duplicating
+labels. Actual letter pronunciation still requires listening; see the diagram-label rules in the
+voice pipeline.
 
-每次声音生成记录 provider、模型来源／修订、说话人、风格指令、种子（如支持）、
-归一化输入、采样率与输出哈希。声音的自然度、温柔慵懒风格、情绪和发音分别评价。
-降语速只改变节奏，不证明音色或表达升级；自动音素检查也不能替代听音。
-实际支持、环境隔离和例子见[配音管线](voice_pipeline.md)。
+For every voice generation, record the provider, model source/revision, speaker, style instruction,
+seed when supported, normalized input, sample rate, and output hash. Evaluate naturalness, a gentle
+or languid style, emotion, and pronunciation separately. Slower delivery changes pacing; it does
+not prove a better timbre or expression. Automated phoneme checks also do not replace listening.
+See the [voice pipeline](voice_pipeline.md) for actual capabilities, environment isolation, and
+examples.
 
-配乐按段落需要选择，可以留白。曲目元数据除来源和许可外，记录主题／情绪标签、
-节奏或 BPM、可用段落、循环条件、建议增益和淡入淡出；确定性选择记录规则、候选、
-最终曲目与种子。曲库不足应写明，不把一个素材的变速版本宣传为丰富曲库。
-旁白期间降低配乐，并检查进出句、跨章切点、低音遮蔽、响度和真峰值；音频避让应
-绑定实际句窗或波形，不依赖估计的字数。风格合适与许可可用是两项独立条件。
+Choose music for each passage's needs; silence is acceptable. In addition to source and license,
+track metadata records theme/mood tags, rhythm or BPM, usable sections, looping conditions,
+suggested gain, and fades. Deterministic selection records the rule, candidates, selected track,
+and seed. Disclose a limited catalog instead of presenting speed variants of one asset as a rich
+library. During narration, duck the music and inspect sentence entrances and exits, chapter cuts,
+low-frequency masking, loudness, and true peaks. Ducking follows measured sentence windows or
+waveforms, rather than estimated character counts. Stylistic suitability and permission to use a
+track are separate requirements.
 
-## 4. 锁定时间轴与片段边界
+## 4. Freeze the timeline and clip boundaries
 
-由真实音频测得句子活动区间，再生成字幕、视觉锚点和章节时长。保留足够的停顿、
-读图和公式停留时间；配音超窗时调整脚本或镜头，不静默截断末字或任意加速整段。
-字幕显示文本与发声内容保持语义一致，TTS 内部音素或发音替换不要直接暴露给观众。
-旁白与画面中的制作记录、版本／工具、验收或复现信息只存工程文档。显示文案由
-renderer 的同一文字来源导出清单，覆盖辅助图注与片尾卡，不能只检查旁白。修订
-后的整段配音、字幕和显示清单重新绑定新稿，防止缓存复用把旧尾声带回成片。
+Measure sentence activity from real audio, then derive subtitles, visual anchors, and chapter
+lengths. Allow adequate pauses, diagram-reading time, and formula holds. If narration exceeds its
+window, revise the script or shot; do not silently cut final syllables or arbitrarily accelerate
+the whole passage. Subtitle display text and spoken content must retain the same meaning. Internal
+TTS phonemes and pronunciation substitutions are not audience text. Production records, versions,
+tools, acceptance details, and reproduction instructions belong only in engineering documents.
+Export display text from the same source used by the renderer, covering auxiliary labels and end
+cards as well as narration. Bind revised narration, subtitles, and display manifests to the new
+text so cache reuse cannot bring back an old ending.
 
-两个 renderer 共享一份正式时间轴。交接时必须明确以下内容，精确字段、默认值和
-验证器以[双引擎接口](engine_integration.md)为准：
+Both renderers share one production timeline. Each handoff must state the following; exact fields,
+defaults, and validators are defined by the [engine contract](engine_integration.md):
 
-- 片段 ID、renderer、输入与输出路径、来源哈希和可复现命令。
-- 宽高、帧率的有理数表示、实际帧数、入出点和对应全局时间；明确区间端点是否包含。
-- 音频有无及归属、采样率、声道；字幕是独立层还是已烧录，避免重复字幕或重复混音。
-- 缩放／裁切、字幕安全区、首尾画面和转场柄；不隐式拉伸画幅或擅自改变片段速度。
+- Clip ID, renderer, input/output paths, source hashes, and reproducible commands.
+- Dimensions, rational frame rate, actual frame count, in/out points, and corresponding global
+  times; specify whether interval endpoints are inclusive.
+- Audio presence and ownership, sample rate, and channels; whether subtitles are separate or burned
+  in, preventing duplicate captions or duplicate mixing.
+- Scaling/cropping, subtitle safe areas, first/last frames, and transition handles; do not silently
+  stretch the aspect ratio or change playback speed.
 
-正式时间可按项目选择的帧网格量化，但音频活动区间要保留测量精度。不要把不同
-帧率的整数帧直接拼接，也不要把文件名中的 `1080p60` 当作媒体规格的证明。
-在正式长渲染期间冻结输入；复用片段前核对源和产物哈希，变化的依赖不得仍标已验收。
+Production time may be quantized to the project's frame grid, but measured audio activity retains
+its precision. Do not concatenate integer frames from different frame rates directly, or treat a
+filename containing `1080p60` as proof of media specifications. Freeze inputs during long production
+renders. Before reusing clips, verify source and output hashes; changed dependencies invalidate
+previous acceptance.
 
-## 5. 先低清，再高清验收
+## 5. Review the draft before the final render
 
-先执行本期适用的数学／状态、词典、契约和排版检查，再低清渲染完整目标范围。
-检查实际编码帧，至少覆盖首尾、关键动作的中段、转场、最长文字和字幕边界；
-涉及回放、状态重置、箭头或遮挡时单独检查。审查结果注明场景、帧位置、来源哈希、
-发现及修复，不能把未检查的场景一起标通过。
+Run the episode's applicable mathematical/state, dictionary, contract, and layout checks, then render
+the complete intended scope at draft quality. Inspect actual encoded frames, including the start
+and end, intermediate stages of key actions, transitions, the longest text, and subtitle boundaries.
+Review replays, state resets, arrows, and occlusions separately where relevant. Record scene/frame
+positions, source hashes, findings, and fixes. Do not mark unexamined scenes as accepted.
 
-低清画面与声画锚点通过后才生成正式版本。高清既要检查排版变化，也要核验最终
-烧录字幕和混音后的容器；只验无字幕源片或字幕层本身不够。
+Produce the final version only after the draft picture and audiovisual anchors pass review. Final
+quality requires checking layout changes as well as the container with its final burned captions
+and mix. Reviewing only an uncaptioned source clip or the subtitle layer is insufficient.
 
-| 验收对象 | 必查内容 |
+| Acceptance subject | Required checks |
 |---|---|
-| 数据与逻辑 | authoring 引用、状态不变量、数学结果、叙事证据与回放一致 |
-| 观众与论述 | 主问题的连续推进、跨章因果承接、显式显示文案检查；最后正文至黑帧只含观众内容 |
-| 画面 | 实际尺寸、帧率、帧数与时间戳；文字、动作、公式、箭头、遮挡、安全区 |
-| 字幕 | 与正文的对应、活动区间、首末帧及空档、是否重复烧录、中文与英文可读性 |
-| 音频 | 实际音轨及采样规格、句子完整性、编码后的同步、响度／真峰值、配乐避让 |
-| 可复现性 | 输入／输出哈希、版本、命令、选曲与合成参数、失败与未跑项 |
+| Data and logic | Authoring references, state invariants, mathematical results, narrative evidence, and replay consistency |
+| Audience and argument | Continuous progress on the main question, causal connections across chapters, declared display text; only audience content from the last body passage to black |
+| Picture | Actual dimensions, frame rate, frame count, and timestamps; text, motion, formulas, arrows, occlusion, and safe areas |
+| Subtitles | Correspondence to narration, activity windows, first/last frames and gaps, duplicate burning, Chinese/English readability |
+| Audio | Actual track and sample specifications, complete sentences, encoded synchronization, loudness/true peaks, and music ducking |
+| Reproducibility | Input/output hashes, versions, commands, music selection and synthesis parameters, failures, and checks not run |
 
-完整解码、字幕像素采样、波形相关性各有边界；分别报告实测范围，不把它们写成
-发音正确或观众理解的证明。改变共享模块时检查真正受影响的调用者；不为完成一处
-文档或局部样例而重渲染整个历史库。
-片尾审查同时覆盖音频、字幕与画面，从最后正文直到黑帧；学术来源可保留，项目
-说明、引擎、内部制作和验收话语不得入片，也不能移到片中。实际听审未做须明示。
+Full decoding, caption pixel sampling, and waveform correlation each have limits. Report their
+actual scope separately; they do not prove pronunciation accuracy or audience understanding. When
+shared modules change, check the callers actually affected. Do not rerender the historical library
+for a documentation edit or a local example.
 
-## 6. 交付与可恢复清理
+Review the ending's audio, subtitles, and picture together, from the final body passage through the
+last black frame. Academic references may remain, but project explanations, engines, internal
+production language, and acceptance language must not appear anywhere in the film. Explicitly state
+when actual listening has not been performed.
 
-交付记录列明视频与封面的真实路径、时长、分辨率、帧率、大小、哈希、旁白／字幕、
-测试证据和未跑项。另存派生规格，保护已发布母版。若向 Library 保存，只记录
-工具确认成功的条目；附件大小限制不等于本机成片无效，也不等于平台已发布。
+## 6. Deliver and clean up recoverably
 
-清理是获用户授权后的独立操作。`media/` 含有需要长期保存的资产，不能按目录名
-或 Git 忽略规则批量删除。先形成候选和保留清单，检查共享引用、符号链接及路径归属，
-记录每项原路径、大小、SHA-256 和总量；范围不确定就保留并说明。
+The delivery record lists real video/cover paths, duration, resolution, frame rate, size, hashes,
+narration/subtitle policy, test evidence, and checks not run. Preserve derived specifications
+separately and protect published masters. For Library saves, report only entries whose successful
+save has been confirmed by a tool. Attachment size limits do not invalidate a local film or imply
+that it has been published to a platform.
 
-通常可清理本期临时分片／隔离缓存、低清预览、QA 临时图、可重建字幕视频层、
-明确不再需要的 clean 临时母版及取消的转码。必须保留最终视频／封面／已交付样片、
-源码、authoring、正文、字幕、必要原始资产和配音、时间轴、验证报告及清理清单。
-高清分章和逐句声音缓存是否必要，由本期复现成本与保留方案判断，不能一概删除。
+Cleanup is a separate, authorized operation. `media/` contains assets that must be retained for the
+long term; neither its name nor Git ignore rules authorize bulk deletion. First prepare candidate
+and retention lists, check shared references, symlinks, and path ownership, and record each original
+path, size, SHA-256, and the total size. Retain uncertain items and explain why.
 
-使用系统废纸篓接口，记录实际恢复位置；若先建恢复包，包内保留原相对路径。
-移动失败或权限不足时停止相关动作并报告，不回退到永久删除。结束后复核所有
-保留文件的大小／哈希及成品可读性，报告移动数量和总大小，不声称磁盘空间已释放。
+Typical candidates include the episode's temporary fragments/isolated caches, draft previews,
+temporary QA images, rebuildable caption layers, clean temporary masters explicitly no longer
+needed, and canceled transcodes. Retain the final video/cover/delivered samples, source code,
+authoring, narration text, subtitles, necessary original assets and voice, timelines, verification
+reports, and cleanup manifests. Whether to keep high-resolution chapter sources and per-sentence
+voice caches depends on the episode's reproduction cost and plan; do not apply a blanket rule.
 
-恢复前核对清单和哈希，先判断原路径是否已有文件；有冲突时不得覆盖新版本。
-恢复包从废纸篓“放回”不一定会将包内文件自动合并回原目录，需按清单逐项恢复。
-历史验收引用的中间媒体被清理后，重跑需先恢复或重建，不能把文件缺失误报成当时验收失败。
+Use the system Trash interface and record the actual recovery location. A recovery package, if
+created first, retains original relative paths. Stop and report failed moves; do not fall back to
+permanent deletion. Afterwards, verify retained files' sizes/hashes and the deliverable's
+readability. Report the number and total size of moved files without claiming that disk space has
+been released.
+
+Before recovery, verify the manifest and hashes, and check whether original paths already exist.
+Do not overwrite newer versions. Restoring a recovery package from Trash does not necessarily merge
+its contents into the original directories; restore items according to the manifest. If cleanup
+removed intermediate media referenced by historical acceptance, restore or rebuild it before
+rerunning checks; a missing file is not evidence that the original acceptance failed.
